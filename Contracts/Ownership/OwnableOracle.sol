@@ -1,5 +1,9 @@
 pragma solidity ^0.4.17;
 
+/**
+ * @dev Ownable for investment contract and can also control the oracle (presumably centrally controlled)
+**/
+
 contract OwnableOracle {
     address public owner;
     address public oracle;
