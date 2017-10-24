@@ -1,6 +1,7 @@
 pragma solidity ^0.4.17;
-import './Math/SafeMath.sol';
-import './Ownership/OwnableOracle.sol';
+import './SafeMath.sol';
+import './OwnableOracle.sol';
+import './StandardToken.sol';
 
 /**
  * @dev This contract accepts COIN deposit with a list of every crypto in desired portfolio
@@ -8,56 +9,42 @@ import './Ownership/OwnableOracle.sol';
  * @dev in COIN depending on the new price of the coins in the portfolio
 **/
 
-contract Token { 
-    function transfer(address _to, uint256 _value) returns (bool);
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool);
-}
-
 contract Investment is OwnableOracle {
     using SafeMath for uint256;
 
-    Token token;
+    RojaxToken token;
     
     // Brokers that are allowed to buy and sell for customers. They can NOT take money,
     // but can mess around with investments so trust is necessary. Only Coinvest to start.
     mapping (address => bool) public allowedBrokers;
     
-    // Mapping that keeps track of the lowest denomination of each crypto (all lowercase)
-    mapping (string => uint256) public cryptoDecimals;
-    
-    // Mapping of the current market price of each crypto (in USD / 10e18 and all lowercase)
-    mapping (string => uint256) public cryptoPrices;
-    
-    // Mapping of arrays of all the cryptos users hold
-    mapping (address => string[]) userCryptos;
-    
-    // The tokens and number of tokens held by each user (all lowercase)
-    mapping (address => mapping (string => uint256)) public userHoldings;
+    mapping (uint256 => CryptoAsset) public cryptoAssets;
 
-    event Buy(address indexed buyer, string[] indexed symbols, uint256[] indexed amounts, address broker);
-    event Sell(address indexed seller, string[] indexed symbols, uint256[] indexed amounts, address broker);
+    // Mapping of arrays of all the cryptos a user holds
+    mapping (address => uint256[]) public userCryptos;
+    
+    // The tokens and number of tokens held by each user: user => cryptoId => amount held
+    mapping (address => mapping (uint256 => uint256)) public userHoldings;
+
+    event Buy(address indexed buyer, uint256[] indexed cryptoIds, uint256[] indexed amounts, address broker);
+    event Sell(address indexed seller, uint256[] indexed cryptoIds, uint256[] indexed amounts, address broker);
+
+    struct CryptoAsset
+    {
+        uint256 cryptoId;
+        string name;
+        uint256 price;
+        uint256 decimals;
+    }
 
 /** ********************************** Defaults ************************************* **/
     
     /**
      * @dev Owner declaration will be changed to Ownable.solidity
-     * @param _token Address of the COIN token so contract can transfer them
     **/
-    function Investment(address _token)
+    function Investment()
     {
-        require(_token != 0);
-        
-        token = Token(_token);
-    }
-    
-    /**
-     * @dev If anyone tries to send Ether here, revert.
-    **/
-    function ()
-      public
-      payable
-    {
-        revert();
+        token = new RojaxToken();
     }
     
 /** ********************************** External ************************************* **/
@@ -65,35 +52,35 @@ contract Investment is OwnableOracle {
     /**
      * @dev Broker will call this for an investor to invest in one or multiple assets
      * @param _beneficiary The address that is being bought for
-     * @param _symbols The symbol for each crypto to invest in
+     * @param _cryptoIds The list of uint IDs for each crypto to buy
      * @param _amounts The amounts of each crypto to buy (measured in COIN wei!)
     **/
-    function buy(address _beneficiary, string[] _symbols, uint256[] _amounts)
+    function buy(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts)
       onlyBrokerOrSender(_beneficiary)
       external
     returns (bool success)
     {
-        require(_symbols.length == _amounts.length);
+        require(_cryptoIds.length == _amounts.length);
         
         uint256 investAmount;
-        for (uint256 i = 0; i < _symbols.length; i++)
+        for (uint256 i = 0; i < _cryptoIds.length; i++)
         {
-            string memory crypto = _symbols[i];
+            uint256 cryptoId = _cryptoIds[i];
             uint256 amount = _amounts[i];
-            require(cryptoPrices[crypto] > 0 && amount > 0);
+            require(cryptoAssets[cryptoId].price > 0 && amount > 0);
             
             // Add the crypto to the array of user's holdings if not already there
-            if (userHoldings[_beneficiary][crypto] == 0) userCryptos[_beneficiary].push(crypto);
+            if (userHoldings[_beneficiary][cryptoId] == 0) userCryptos[_beneficiary].push(cryptoId);
             
             // Add crypto amounts to user Holdings
             // SafeMath prevents (unlikely) overflow
-            userHoldings[_beneficiary][crypto] = userHoldings[_beneficiary][crypto].add(amount);
+            userHoldings[_beneficiary][cryptoId] = userHoldings[_beneficiary][cryptoId].add(amount);
             
             // Keep track of the COIN value of the investment to later accept as payment
-            investAmount = investAmount.add(calculateCoinValue(crypto, amount));
+            investAmount = investAmount.add(calculateCoinValue(cryptoId, amount));
         }
-        assert(token.transferFrom(msg.sender, this, investAmount));
-        Buy(_beneficiary, _symbols, _amounts, msg.sender);
+        //token.transferFrom(msg.sender, this, investAmount);
+        Buy(_beneficiary, _cryptoIds, _amounts, msg.sender);
         return true;
     }
     
@@ -102,44 +89,57 @@ contract Investment is OwnableOracle {
      * @dev Broker has the ability to sell whenever--trust, yes--terrible, no.
      * @dev Can fix this by having a user approve a sale, but this saves gas.
      * @param _beneficiary The address that is being sold for
-     * @param _symbols The symbol for each crypto to sell
+     * @param _cryptoIds The list of uint IDs for each crypto
      * @param _amounts The amounts of each crypto to sell (measured in COIN wei!)
     **/
-    function sell(address _beneficiary, string[] _symbols, uint256[] _amounts)
+    function sell(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts)
       onlyBrokerOrSender(_beneficiary)
       external
     returns (bool success)
     {
-        require(_symbols.length == _amounts.length);
+        require(_cryptoIds.length == _amounts.length);
         
         uint256 withdrawAmount;
-        for (uint256 i = 0; i < _symbols.length; i++)
+        for (uint256 i = 0; i < _cryptoIds.length; i++)
         {
-            string memory crypto = _symbols[i];
+            uint256 cryptoId = _cryptoIds[i];
             uint256 amount = _amounts[i];
-            require(cryptoPrices[crypto] > 0 && amount > 0);
+            require(cryptoAssets[cryptoId].price > 0 && amount > 0);
             
             // Add crypto amounts to user Holdings
             // SafeMath sub ensures underflow safety
-            userHoldings[_beneficiary][crypto].sub(amount);
+            userHoldings[_beneficiary][cryptoId].sub(amount);
 
             // If balance is decremented to 0, remove holding from user's list            
-            if (userHoldings[_beneficiary][crypto] == 0) deleteHolding(crypto, _beneficiary);
+            if (userHoldings[_beneficiary][cryptoId] == 0) deleteHolding(cryptoId, _beneficiary);
             
             // Keep track of the COIN value of the investment to later accept as payment
-            withdrawAmount = withdrawAmount.add(calculateCoinValue(crypto, amount));
+            withdrawAmount = withdrawAmount.add(calculateCoinValue(cryptoId, amount));
         }
-        assert(token.transfer(_beneficiary, withdrawAmount));
-        Sell(_beneficiary, _symbols, _amounts, msg.sender);
+        //token.transfer(_beneficiary, withdrawAmount);
+        Sell(_beneficiary, _cryptoIds, _amounts, msg.sender);
         return true;
     }
     
+    /**
+     * @dev Returns an array of crypto asset IDs that the user has holdings in
+     * @param _user The user whose holdings should be checked
+    **/
     function holdings(address _user)
       external
       constant
-    returns (string[] cryptos)
+    returns (uint256 coinValue)
     {
-        return userCryptos[_user];
+        uint256[] cryptos = userCryptos[_user];
+        for (uint256 i = 0; i < cryptos.length; i++)
+        {
+            CryptoAsset crypto = cryptoAssets[cryptos[i]];
+            uint256 holding = userHoldings[_user][crypto.cryptoId];
+            
+            uint256 cryptoValue = calculateCoinValue(crypto.price, holding);
+            coinValue += cryptoValue;
+        }
+        return coinValue;
     }
     
 /** ********************************** Internal ************************************** **/
@@ -147,17 +147,17 @@ contract Investment is OwnableOracle {
     /**
      * @dev Deletes the crypto symbol from user's userCryptos array.
      * @dev Only called from sell when holdings for the crypto decrements to 0.
-     * @param _symbol The symbol of the crypto to be taken off the user's list
+     * @param _cryptoId The symbol of the crypto to be taken off the user's list
      * @param _user The user whose holdings must be changed
     **/
-    function deleteHolding(string _symbol, address _user)
+    function deleteHolding(uint256 _cryptoId, address _user)
       internal
     returns (bool success)
     {
-        string[] storage holdings = userCryptos[_user];
+        uint256[] storage holdings = userCryptos[_user];
         for (uint256 i = 0; i < holdings.length; i++)
         {
-            if (stringsEqual(holdings[i], _symbol)) 
+            if (holdings[i] == _cryptoId) 
             {
                 holdings[i] = holdings[holdings.length - 1];
                 holdings.length--;
@@ -166,40 +166,19 @@ contract Investment is OwnableOracle {
         }
         return false;
     }
-    
-    /**
-     * @dev Solidity needs this to compare two strings (for crypto symbols)
-     * @param _a First string for the comparison
-     * @param _b Second string for the comparison
-    **/
-    function stringsEqual(string storage _a, string memory _b) 
-      internal 
-    returns (bool equal) 
-    {
-		bytes storage a = bytes(_a);
-		bytes memory b = bytes(_b);
-		
-		if (a.length != b.length)
-			return false;
-		
-		for (uint i = 0; i < a.length; i ++)
-		{
-			if (a[i] != b[i]) return false;
-		}
-		return true;
-	}
 
     /**
      * @dev Calculates how many COIN wei an amount of a crypto asset is worth
-     * @param _symbol The symbol of the cryptonized asset
+     * @param _cryptoId The symbol of the cryptonized asset
      * @param _amount The amount of the cryptonized asset desired
     **/
-    function calculateCoinValue(string _symbol, uint256 _amount)
+    function calculateCoinValue(uint256 _cryptoId, uint256 _amount)
       internal
     returns (uint256 coinAmount)
     {
-        uint256 currentCoinValue = cryptoPrices['coin'];
-        uint256 tokenValue = cryptoPrices[_symbol];
+        CryptoAsset memory crypto = cryptoAssets[_cryptoId];
+        uint256 currentCoinValue = crypto.price;
+        uint256 tokenValue = cryptoAssets[0].price;
         
         // We must get the coinAmount in COIN "wei" so coin is made 18 decimals longer
         // eachTokenValue finds the amount of COINs 1 token is worth
@@ -207,7 +186,7 @@ contract Investment is OwnableOracle {
         
         // We must now find the COIN value of the desired amount of the token
         // _amount will be given in native token "wei" so we must make sure we account for that
-        coinAmount = eachTokenValue * (10 ** cryptoDecimals[_symbol]) / _amount; 
+        coinAmount = eachTokenValue * (10 ** crypto.decimals) / _amount; 
         return coinAmount;
     }
     
@@ -215,20 +194,20 @@ contract Investment is OwnableOracle {
     
     /**
      * @dev Oracle sets the current market price for all used cryptos
-     * @param _symbols Market symbols of the cryptos
+     * @param _cryptoIds Market symbols of the cryptos
      * @param _prices The new market prices of the cryptos
     **/
-    function setPrices(string[] _symbols, uint256[] _prices)
+    function setPrices(uint256[] _cryptoIds, uint256[] _prices)
       onlyOracle
       external
     returns (bool success)
     {
-        require(_symbols.length == _prices.length);
+        require(_cryptoIds.length == _prices.length);
         
-        for (uint256 i = 0; i < _symbols.length; i++)
+        for (uint256 i = 0; i < _cryptoIds.length; i++)
         {
-            require(cryptoPrices[_symbols[i]] > 0);
-            cryptoPrices[_symbols[i]] == _prices[i];
+            require(cryptoAssets[_cryptoIds[i]].price > 0);
+            cryptoAssets[_cryptoIds[i]].price == _prices[i];
         }
         return true;
     }
@@ -241,15 +220,15 @@ contract Investment is OwnableOracle {
      * @param _decimals How many decimal places the crypto has
      * @param _price Current market price to begin the crypto selling at
     **/
-    function addCrypto(string _symbol, uint256 _decimals, uint256 _price)
+    function addCrypto(uint256 _cryptoId, string _symbol, uint256 _price, uint256 _decimals)
       onlyOwner
       external
     returns (bool success)
     {
         require(_decimals > 0 && _price > 0);
         
-        cryptoDecimals[_symbol] = _decimals;
-        cryptoPrices[_symbol] = _price;
+        CryptoAsset memory crypto = CryptoAsset(_cryptoId, _symbol, _price, _decimals);
+        cryptoAssets[_cryptoId] = crypto;
         return true;
     }
     
