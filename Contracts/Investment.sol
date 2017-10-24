@@ -12,7 +12,7 @@ import './StandardToken.sol';
 contract Investment is OwnableOracle {
     using SafeMath for uint256;
 
-    RojaxToken token;
+    //RojaxToken token;
     
     // Brokers that are allowed to buy and sell for customers. They can NOT take money,
     // but can mess around with investments so trust is necessary. Only Coinvest to start.
@@ -31,10 +31,10 @@ contract Investment is OwnableOracle {
 
     struct CryptoAsset
     {
-        uint256 cryptoId;
-        string name;
-        uint256 price;
-        uint256 decimals;
+        uint256 cryptoId;           // Assigned unique ID fo the crypto
+        string name;                // Symbol of the crypto
+        uint256 price;              // In USD / 10^18
+        uint256 decimals;           // Number of decimal places the crypto has
     }
 
 /** ********************************** Defaults ************************************* **/
@@ -44,7 +44,7 @@ contract Investment is OwnableOracle {
     **/
     function Investment()
     {
-        token = new RojaxToken();
+        //token = new RojaxToken();
     }
     
 /** ********************************** External ************************************* **/
@@ -136,7 +136,7 @@ contract Investment is OwnableOracle {
             CryptoAsset crypto = cryptoAssets[cryptos[i]];
             uint256 holding = userHoldings[_user][crypto.cryptoId];
             
-            uint256 cryptoValue = calculateCoinValue(crypto.price, holding);
+            uint256 cryptoValue = calculateCoinValue(crypto.cryptoId, holding);
             coinValue += cryptoValue;
         }
         return coinValue;
@@ -177,8 +177,8 @@ contract Investment is OwnableOracle {
     returns (uint256 coinAmount)
     {
         CryptoAsset memory crypto = cryptoAssets[_cryptoId];
-        uint256 currentCoinValue = crypto.price;
-        uint256 tokenValue = cryptoAssets[0].price;
+        uint256 currentCoinValue = cryptoAssets[0].price;
+        uint256 tokenValue = crypto.price;
         
         // We must get the coinAmount in COIN "wei" so coin is made 18 decimals longer
         // eachTokenValue finds the amount of COINs 1 token is worth
@@ -186,7 +186,7 @@ contract Investment is OwnableOracle {
         
         // We must now find the COIN value of the desired amount of the token
         // _amount will be given in native token "wei" so we must make sure we account for that
-        coinAmount = eachTokenValue * (10 ** crypto.decimals) / _amount; 
+        coinAmount = eachTokenValue * _amount / cryptoAssets[0].price; 
         return coinAmount;
     }
     
