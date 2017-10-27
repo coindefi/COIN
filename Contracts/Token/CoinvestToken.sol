@@ -62,7 +62,6 @@ contract CoinvestToken is ERC20Base {
       external
     {
         balances[msg.sender] = balances[msg.sender].sub(_amount);
-        // No overflow check cause that shit ain't happenin'
         balances[_to] = balances[_to].add(_amount);
 
         Transfer(msg.sender, _to, _amount);
