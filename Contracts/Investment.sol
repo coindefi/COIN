@@ -1,7 +1,7 @@
 pragma solidity ^0.4.17;
-import './SafeMath.sol';
-import './OwnableOracle.sol';
-import './CoinvestToken.sol';
+import './Math/SafeMath.sol';
+import './Ownership/OwnableOracle.sol';
+import './Token/CoinvestToken.sol';
 
 /**
  * @dev This contract accepts COIN deposit with a list of every crypto in desired portfolio
