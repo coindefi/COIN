@@ -8,8 +8,8 @@ import '../Token/ERC20Base.sol';
 contract CoinvestToken is ERC20Base {
     using SafeMath for uint256;
     
-    string public constant symbol = "RJX";
-    string public constant name = "Rojax";
+    string public constant symbol = "COIN";
+    string public constant name = "Coinvest";
     
     // Storing small numbers is cheaper.
     uint public constant decimals = 18;
@@ -24,7 +24,7 @@ contract CoinvestToken is ERC20Base {
     /**
      * @dev Set owner and beginning balance.
     **/
-    function RojaxToken()
+    function CoinvestToken()
       public
     {
         balances[msg.sender] = _totalSupply;
@@ -92,7 +92,8 @@ contract CoinvestToken is ERC20Base {
       external
     {
         require(balances[msg.sender] >= _amount);
-        
+        require(_amount == 0 || allowed[msg.sender][_spender] == 0);
+
         allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
     }
