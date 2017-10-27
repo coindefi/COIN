@@ -1,13 +1,15 @@
 pragma solidity ^0.4.18;
-import './ERC20Base.sol';
+import '../Math/SafeMath.sol';
+import '../Token/ERC20Base.sol';
 /**
- * @dev Here we aim to make the most gas efficient Solidity ERC20 
- * @dev token possible while maintaining all necessary functions.
+ * @dev Here we have a very standard, clean ERC20.
 **/
 
 contract CoinvestToken is ERC20Base {
-    string public constant symbol = "COIN";
-    string public constant name = "Coinvest";
+    using SafeMath for uint256;
+    
+    string public constant symbol = "RJX";
+    string public constant name = "Rojax";
     
     // Storing small numbers is cheaper.
     uint public constant decimals = 18;
@@ -22,7 +24,7 @@ contract CoinvestToken is ERC20Base {
     /**
      * @dev Set owner and beginning balance.
     **/
-    function CoinvestToken()
+    function RojaxToken()
       public
     {
         balances[msg.sender] = _totalSupply;
@@ -59,12 +61,9 @@ contract CoinvestToken is ERC20Base {
     function transfer(address _to, uint256 _amount) 
       external
     {
-        // Throw if insufficient balance
-        require(balances[msg.sender] >= _amount);
-        
-        balances[msg.sender] -= _amount;
+        balances[msg.sender] = balances[msg.sender].sub(_amount);
         // No overflow check cause that shit ain't happenin'
-        balances[_to] += _amount;
+        balances[_to] = balances[_to].add(_amount);
 
         Transfer(msg.sender, _to, _amount);
     }
@@ -78,12 +77,9 @@ contract CoinvestToken is ERC20Base {
     function transferFrom(address _from, address _to, uint _amount)
       external
     {
-        // && require slightly more efficient than 2 requires
-        require(balances[_from] >= _amount && allowed[_from][msg.sender] >= _amount);
-
-        allowed[_from][msg.sender] -= _amount;
-        balances[_from] -= _amount;
-        balances[_to] += _amount;
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
+        balances[_from] = balances[_from].sub(_amount);
+        balances[_to] = balances[_to].add(_amount);
         
         Transfer(_from, _to, _amount);
     }
