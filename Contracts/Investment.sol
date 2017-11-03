@@ -1,7 +1,7 @@
 pragma solidity ^0.4.17;
-import './Math/SafeMath.sol';
-import './Ownership/OwnableOracle.sol';
-import './Token/CoinvestToken.sol';
+import './SafeMath.sol';
+import './OwnableOracle.sol';
+//import './CoinvestToken.sol';
 
 /**
  * @dev This contract accepts COIN deposit with a list of every crypto in desired portfolio
@@ -13,6 +13,8 @@ contract Investment is OwnableOracle {
     using SafeMath for uint256;
 
     //RojaxToken token;
+    // Has investing and liquidating been paused (may not do either function if so)
+    bool public tradingPaused;
     
     // Brokers that are allowed to buy and sell for customers. They can NOT take money,
     // but can mess around with investments so trust is necessary. Only Coinvest to start.
@@ -33,19 +35,17 @@ contract Investment is OwnableOracle {
     // Each short must be saved separately in an array because we must save each trade's initial price
     mapping (address => mapping (uint256 => ShortInfo[])) public userShortHoldings;
 
-    event Invest(address indexed buyer, uint256[] indexed cryptoIds, uint256[] indexed amounts, bool[] shorts, address broker);
+    event Invest(address indexed buyer, uint256[] cryptoIds, uint256[] amounts, bool[] shorts, address broker);
     event Liquidate(address indexed seller, uint256[] indexed cryptoIds, uint256[] indexed amounts, address broker);
 
-    struct CryptoAsset
-    {
+    struct CryptoAsset {
         uint256 cryptoId;           // Assigned unique ID fo the crypto
         string name;                // Symbol of the crypto
         uint256 price;              // In USD / 10^18
         uint256 decimals;           // Number of decimal places the crypto has
     }
     
-    struct ShortInfo
-    {
+    struct ShortInfo {
         uint256 amount;             // The unique ID of the crypto being shorted
         uint256 investAmount;       // Original amount invested: 2 * amount * originalPrice to account for price rise
         uint256 originalPrice;      // The price that the short was initiated at
@@ -56,8 +56,7 @@ contract Investment is OwnableOracle {
     /**
      * @dev Owner declaration will be changed to Ownable.solidity
     **/
-    function Investment()
-    {
+    function Investment() public {
         //token = new RojaxToken();
     }
     
@@ -71,22 +70,26 @@ contract Investment is OwnableOracle {
     **/
     function invest(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts, bool[] _shorts)
       onlyBrokerOrSender(_beneficiary)
+      tradeable()
       external
     returns (bool success)
     {
         require(_cryptoIds.length == _amounts.length && _amounts.length == _shorts.length);
         
         uint256 investAmount;
-        for (uint256 i = 0; i < _cryptoIds.length; i++)
-        {
-            CryptoAsset crypto = cryptoAssets[_cryptoIds[i]];
+        for (uint256 i = 0; i < _cryptoIds.length; i++) {
+            CryptoAsset storage crypto = cryptoAssets[_cryptoIds[i]];
             uint256 amount = _amounts[i];
             require(crypto.price > 0 && amount > 0);
             
-            if (_shorts[i]) investAmount = short(_beneficiary, crypto.cryptoId, amount);
-            else investAmount = buy(_beneficiary, crypto.cryptoId, amount);
+            if (_shorts[i]) {
+                investAmount += short(_beneficiary, crypto.cryptoId, amount);
+            } else {
+                investAmount += buy(_beneficiary, crypto.cryptoId, amount);
+            }
         }
-        uint256 fee = investAmount / 1000;
+
+        //uint256 fee = investAmount / 1000;
         //token.transferFrom(msg.sender, owner, fee);
         //token.transferFrom(msg.sender, this, investAmount - fee);
         Invest(_beneficiary, _cryptoIds, _amounts, _shorts, msg.sender);
@@ -104,7 +107,9 @@ contract Investment is OwnableOracle {
     returns (uint256 investAmount)
     {
         // Add the crypto to the array of user's holdings if not already there
-        if (userHoldings[_beneficiary][_cryptoId] == 0) userCryptos[_beneficiary].push(_cryptoId);
+        if (userHoldings[_beneficiary][_cryptoId] == 0) {
+            userCryptos[_beneficiary].push(_cryptoId);
+        }
             
         // Add crypto amounts to user Holdings
         // SafeMath prevents (unlikely) overflow
@@ -117,6 +122,7 @@ contract Investment is OwnableOracle {
     
     /**
      * @dev function short *shorts* a single crypto (as opposed to buying).
+     * @param _beneficiary The address of the buyer
      * @param _cryptoId The unique ID of the crypto to short
      * @param _amount The amount of the crypto to short
     **/
@@ -129,7 +135,9 @@ contract Investment is OwnableOracle {
         ShortInfo memory shortInfo = ShortInfo(_amount, investAmount, cryptoAssets[_cryptoId].price);
 
         // Add the crypto to the array of user's holdings if not already there
-        if (userShortHoldings[_beneficiary][_cryptoId][0].amount == 0) userShortCryptos[_beneficiary].push(_cryptoId);
+        if (userShortHoldings[_beneficiary][_cryptoId].length == 0) {
+            userShortCryptos[_beneficiary].push(_cryptoId);
+        }
 
         // Add crypto amounts to user Holdings
         // SafeMath prevents (unlikely) overflow
@@ -148,22 +156,26 @@ contract Investment is OwnableOracle {
     **/
     function liquidate(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts, bool[] _shorts)
       onlyBrokerOrSender(_beneficiary)
+      tradeable()
       external
     returns (bool success)
     {
         require(_cryptoIds.length == _amounts.length && _amounts.length == _shorts.length);
         
         uint256 withdrawAmount;
-        for (uint256 i = 0; i < _cryptoIds.length; i++)
-        {
+        for (uint256 i = 0; i < _cryptoIds.length; i++) {
             uint256 cryptoId = _cryptoIds[i];
             uint256 amount = _amounts[i];
             require(amount > 0);
             
-            if (_shorts[i]) withdrawAmount = cover(_beneficiary, cryptoId, amount);
-            else withdrawAmount = sell(_beneficiary, cryptoId, amount);
+            if (_shorts[i]) {
+                withdrawAmount += cover(_beneficiary, cryptoId, amount);
+            } else {
+                withdrawAmount += sell(_beneficiary, cryptoId, amount);
+            }
         }
-        uint256 fee = withdrawAmount / 1000;
+
+        //uint256 fee = withdrawAmount / 1000;
         //token.transfer(owner, fee);
         //token.transfer(_beneficiary, withdrawAmount - fee);
         Liquidate(_beneficiary, _cryptoIds, _amounts, msg.sender);
@@ -181,7 +193,9 @@ contract Investment is OwnableOracle {
         userHoldings[_beneficiary][_cryptoId] = userHoldings[_beneficiary][_cryptoId].sub(_amount);
 
         // If balance is decremented to 0, remove holding from user's list            
-        if (userHoldings[_beneficiary][_cryptoId] == 0) deleteHolding(_cryptoId, _beneficiary, false);
+        if (userHoldings[_beneficiary][_cryptoId] == 0) { 
+            deleteHolding(_cryptoId, _beneficiary, false);
+        }
             
         // Keep track of the COIN value of the investment to later accept as payment
         withdrawAmount = withdrawAmount.add(calculateCoinValue(_cryptoId, _amount));
@@ -197,8 +211,7 @@ contract Investment is OwnableOracle {
         // Total amount covered (added to after each trade that doesn't complete cover)
         uint256 amountCovered;
         
-        for (uint256 i = 0; i < userShortHoldings[_beneficiary][_cryptoId].length; i++)
-        {
+        for (uint256 i = 0; i < userShortHoldings[_beneficiary][_cryptoId].length; i++) {
             ShortInfo memory shortInfo = userShortHoldings[_beneficiary][_cryptoId][i];
             
             // Amount of crypto that was shorted in this particular trade
@@ -209,8 +222,11 @@ contract Investment is OwnableOracle {
             uint256 coverAmount;
 
             // If we've exceeded the total amount to be covered, cover only a fraction of the trade
-            if (amountCovered >= _amount) coverAmount = amountCovered.sub(_amount);
-            else coverAmount = tradeAmount;
+            if (amountCovered >= _amount) {
+                coverAmount = amountCovered.sub(_amount);
+            } else {
+                coverAmount = tradeAmount;
+            }
 
             // Add crypto amounts to user Holdings
             // SafeMath sub ensures underflow safety
@@ -222,7 +238,9 @@ contract Investment is OwnableOracle {
             withdrawAmount += calculateShortValue(_cryptoId, investAmount, coverAmount);
 
             // If balance is decremented to 0, remove holding from user's list            
-            if (shortInfo.amount == 0) deleteHolding(_cryptoId, _beneficiary, true);
+            if (shortInfo.amount == 0) { 
+                deleteHolding(_cryptoId, _beneficiary, true);
+            }
         }
         // By the way, these returns aren't necessary but the explicitiveness is nice.
         // They may be taken out later if we want to save the tiny amount of gas.
@@ -239,25 +257,24 @@ contract Investment is OwnableOracle {
       constant
     returns (uint256 coinValue)
     {
-        uint256[] cryptos = userCryptos[_user];
-        for (uint256 i = 0; i < cryptos.length; i++)
-        {
-            CryptoAsset crypto = cryptoAssets[cryptos[i]];
+        uint256[] storage cryptos = userCryptos[_user];
+        for (uint256 i = 0; i < cryptos.length; i++) {
+            CryptoAsset storage crypto = cryptoAssets[cryptos[i]];
             uint256 holding = userHoldings[_user][crypto.cryptoId];
             
             uint256 cryptoValue = calculateCoinValue(crypto.cryptoId, holding);
-            coinValue += cryptoValue;
+            coinValue = coinValue.add(cryptoValue);
         }
 
-        uint256[] shortCryptos = userShortCryptos[_user];
-        for (uint256 j = 0; j < shortCryptos.length; j++)
-        {
-            CryptoAsset shortCrypto = cryptoAssets[cryptos[i]];
-            ShortInfo[] shortHoldings = userShortHoldings[_user][crypto.cryptoId];
-            for (uint256 k = 0; k < shortHoldings.length; k++)
-            {
-                uint256 shortCryptoValue = calculateShortValue(shortCrypto.cryptoId, shortHoldings[i].amount, shortHoldings[i].investAmount);
-                coinValue += shortCryptoValue;   
+        uint256[] storage shortCryptos = userShortCryptos[_user];
+        for (uint256 j = 0; j < shortCryptos.length; j++) {
+            CryptoAsset storage shortCrypto = cryptoAssets[shortCryptos[j]];
+            ShortInfo[] storage shortHoldings = userShortHoldings[_user][shortCrypto.cryptoId];
+
+            for (uint256 k = 0; k < shortHoldings.length; k++) {
+                uint256 shortCryptoValue = calculateShortValue(shortCrypto.cryptoId, shortHoldings[k].amount, shortHoldings[k].investAmount);
+                coinValue = coinValue.add(shortCryptoValue);
+                //coinValue += shortCryptoValue;   
             }
         }
         return coinValue;
@@ -275,13 +292,10 @@ contract Investment is OwnableOracle {
       internal
     returns (bool success)
     {
-        if (_short) 
-        {
+        if (_short) {
             uint256[] storage shortHoldings = userShortCryptos[_user];
-            for (uint256 i = 0; i < shortHoldings.length; i++)
-            {
-                if (shortHoldings[i] == _cryptoId) 
-                {
+            for (uint256 i = 0; i < shortHoldings.length; i++) {
+                if (shortHoldings[i] == _cryptoId) {
                     shortHoldings[i] = shortHoldings[shortHoldings.length - 1];
                     shortHoldings.length--;
                     return true;
@@ -290,10 +304,8 @@ contract Investment is OwnableOracle {
         }
 
         uint256[] storage holdings = userCryptos[_user];
-        for (uint256 j = 0; j < holdings.length; j++)
-        {
-            if (holdings[j] == _cryptoId) 
-            {
+        for (uint256 j = 0; j < holdings.length; j++) {
+            if (holdings[j] == _cryptoId) {
                 holdings[j] = holdings[holdings.length - 1];
                 holdings.length--;
                 return true;
@@ -308,7 +320,7 @@ contract Investment is OwnableOracle {
      * @param _amount The amount of the cryptonized asset desired
     **/
     function calculateCoinValue(uint256 _cryptoId, uint256 _amount)
-      internal
+      internal view
     returns (uint256 coinAmount)
     {
         CryptoAsset memory crypto = cryptoAssets[_cryptoId];
@@ -327,6 +339,7 @@ contract Investment is OwnableOracle {
     
     function calculateShortValue(uint256 _cryptoId, uint256 _amount, uint256 _investAmount)
       internal
+      view
     returns (uint256 coinAmount)
     {
         uint256 currentValue = calculateCoinValue(_cryptoId, _amount);
@@ -353,10 +366,9 @@ contract Investment is OwnableOracle {
     {
         require(_cryptoIds.length == _prices.length);
         
-        for (uint256 i = 0; i < _cryptoIds.length; i++)
-        {
+        for (uint256 i = 0; i < _cryptoIds.length; i++) {
             require(cryptoAssets[_cryptoIds[i]].price > 0);
-            cryptoAssets[_cryptoIds[i]].price == _prices[i];
+            cryptoAssets[_cryptoIds[i]].price = _prices[i];
         }
         return true;
     }
@@ -398,6 +410,20 @@ contract Investment is OwnableOracle {
         return true;
     }
     
+    /**
+     * @dev Owner can call to stop any trading activity on the contract.
+     * @dev Useful when this contract becomes deprecated but maybe a ransom risk?
+     * @param _stop Whether to stop (true) or start (false) the contract.
+    **/
+    function pauseTrading(bool _stop)
+      external
+      onlyOwner
+    returns (bool success)
+    {
+        tradingPaused = _stop;
+        return true;
+    }
+    
 /** ********************************* Modifiers ************************************* **/
     
     /**
@@ -408,6 +434,15 @@ contract Investment is OwnableOracle {
     modifier onlyBrokerOrSender(address beneficiary)
     {
         require(allowedBrokers[msg.sender] || msg.sender == beneficiary);
+        _;
+    }
+    
+    /**
+     * @dev Checks whether trading has been paused.
+    **/
+    modifier tradeable()
+    {
+        require(!tradingPaused);
         _;
     }
 }
