@@ -1,7 +1,8 @@
 pragma solidity ^0.4.17;
 import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
 import "github.com/Arachnid/solidity-stringutils/strings.sol";
-import "./Ownership/Ownable.sol";
+import "../Ownership/Ownable.sol";
+import "../Investment/Investment.sol";
 /**
  * @title PriceFinder
  * @dev This contract queries cryptocompare every 60 seconds
@@ -11,6 +12,7 @@ import "./Ownership/Ownable.sol";
 contract PriceOracle is usingOraclize, Ownable {
     using strings for *;
     
+    Investment investContract;
     address public owner; // Owner is able to add new cryptos to find price for
     mapping (string => string) symbolUrls; // Symbol ("COIN") of the crypto to search
     
@@ -18,8 +20,9 @@ contract PriceOracle is usingOraclize, Ownable {
     event newPrice(string symbol, uint256 price);
     
 
-    function PriceOracle() {
+    function PriceOracle(address _investContract) {
         oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
+        investContract = Investment(_investContract);
     }
 
     /**
@@ -32,6 +35,8 @@ contract PriceOracle is usingOraclize, Ownable {
         string memory symbol = findSymbol(result);
         uint256 price = findPrice(result);
         newPrice(symbol, price);
+        
+        investContract.setPrices([symbol],[price]);
         update(symbol);
     }
 
