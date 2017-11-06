@@ -60,6 +60,9 @@ contract PriceOracle is usingOraclize, Ownable {
     {
         var s = _result.toSlice();
         strings.slice memory part;
+        s.rsplit('"'.toSlice(), part);
+        s.rsplit('"'.toSlice(), part);
+        s.rsplit('"'.toSlice(), part);
         s.split('"'.toSlice(), part);
         s.split('"'.toSlice(), part);
         var sString = s.toString();
