@@ -64,7 +64,6 @@ contract PriceOracle is usingOraclize, Ownable {
         s.rsplit('"'.toSlice(), part);
         s.rsplit('"'.toSlice(), part);
         s.split('"'.toSlice(), part);
-        s.split('"'.toSlice(), part);
         var sString = s.toString();
         return sString;
     }
@@ -81,7 +80,7 @@ contract PriceOracle is usingOraclize, Ownable {
         strings.slice memory part;
         s.split(':'.toSlice(), part);
         s.split(':'.toSlice(), part);
-        s.split('}'.toSlice(), part);
+        s.rsplit('}'.toSlice(), part);
     
         var sString = s.toString();
         newPrice = parseInt(sString, 5);
