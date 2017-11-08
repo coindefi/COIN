@@ -35,8 +35,8 @@ contract Investment is OwnableOracle {
     // Each short must be saved separately in an array because we must save each trade's initial price
     mapping (address => mapping (uint256 => ShortInfo[])) public userShortHoldings;
 
-    event Invest(address indexed buyer, uint256[] cryptoIds, uint256[] amounts, bool[] shorts, address broker);
-    event Liquidate(address indexed seller, uint256[] indexed cryptoIds, uint256[] indexed amounts, address broker);
+    event Invest(address indexed buyer, bytes32 indexed fundName, uint256[] cryptoIds, uint256[] amounts, bool[] shorts, address indexed broker);
+    event Liquidate(address indexed seller, bytes32 indexed fundName, uint256[] cryptoIds, uint256[] amounts, address indexed broker);
 
     struct CryptoAsset {
         uint256 cryptoId;           // Assigned unique ID fo the crypto
@@ -65,10 +65,11 @@ contract Investment is OwnableOracle {
     /**
      * @dev Broker (or buyer) will call invest and may buy or short.
      * @param _beneficiary The address that is being bought for
+     * @param _fundName The name the broker chooses for this combination of cryptonized assets
      * @param _cryptoIds The list of uint IDs for each crypto to buy
      * @param _amounts The amounts of each crypto to buy (measured in COIN wei!)
     **/
-    function invest(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts, bool[] _shorts)
+    function invest(address _beneficiary, bytes32 _fundName, uint256[] _cryptoIds, uint256[] _amounts, bool[] _shorts)
       onlyBrokerOrSender(_beneficiary)
       tradeable()
       external
@@ -92,7 +93,7 @@ contract Investment is OwnableOracle {
         //uint256 fee = investAmount / 1000;
         //token.transferFrom(msg.sender, owner, fee);
         //token.transferFrom(msg.sender, this, investAmount - fee);
-        Invest(_beneficiary, _cryptoIds, _amounts, _shorts, msg.sender);
+        Invest(_beneficiary, _fundName, _cryptoIds, _amounts, _shorts, msg.sender);
         return true;
     }
     
@@ -151,10 +152,11 @@ contract Investment is OwnableOracle {
      * @dev Broker has the ability to sell whenever--trust, yes--terrible, no.
      * @dev Can fix this by having a user approve a sale, but this saves gas.
      * @param _beneficiary The address that is being sold for
+     * @param _fundName The name the broker chooses for this combination of cryptonized assets
      * @param _cryptoIds The list of uint IDs for each crypto
      * @param _amounts The amounts of each crypto to sell (measured in COIN wei!)
     **/
-    function liquidate(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts, bool[] _shorts)
+    function liquidate(address _beneficiary, bytes32 _fundName, uint256[] _cryptoIds, uint256[] _amounts, bool[] _shorts)
       onlyBrokerOrSender(_beneficiary)
       tradeable()
       external
@@ -178,7 +180,7 @@ contract Investment is OwnableOracle {
         //uint256 fee = withdrawAmount / 1000;
         //token.transfer(owner, fee);
         //token.transfer(_beneficiary, withdrawAmount - fee);
-        Liquidate(_beneficiary, _cryptoIds, _amounts, msg.sender);
+        Liquidate(_beneficiary, _fundName, _cryptoIds, _amounts, msg.sender);
         return true;
     }
     
