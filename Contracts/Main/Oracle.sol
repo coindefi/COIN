@@ -7,6 +7,7 @@ import "../Ownership/Privileged.sol";
  * @title Oracle
  * @dev This contract queries cryptocompare every 60 seconds
  * @dev to find the most recent prices for all investable cryptos.
+ * @notice This will be changed in the future to query all cryptos at once.
 */
 
 contract Oracle is usingOraclize, Privileged {
