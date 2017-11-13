@@ -1,24 +1,23 @@
 # Coinvest
-
+Coinvest is a decentralized stock exchange that allows users to invest in an array of cryptocurrencies in a very simple manner. When a user wants to make a trade, the Coinvest Token ("COIN") is sent to the contract along with a list of the cryptonized assets the user would like to invest in. The amounts and prices of purchased assets are recorded in USD and when a user would like to liquidate their holdings, they follow the same process of selling a certain amount of chosen assets and their address is returned COIN in the USD value of the profits earned. This will all be handled through the easy-to-use Coinvest frontend so now anyone can invest in cryptocurrencies.
+</br>
+</br>
+<h2>Contracts</h2>
 Coinvest is made up of 4 main contracts:
 </br>
 CoinvestToken.sol, Investment.sol, Bank.sol, and Oracle.sol.
 </br>
 </br>
 <h2>CoinvestToken.sol</h2>
-</br>
 CoinvestToken ("COIN") is a default ERC20. It's used as the currency required to make all trades on Investment.sol and is the currency that Bank.sol holds.
 </br>
 <h2>Investment.sol</h2>
-</br>
 The Investment contract is the real meat of Coinvest. Here users (or, more likely, the Coinvest frontend acting for a user) may invest in singular cryptonized assets or a fund containing multiple cryptonized assets, liquidate their past purchases, and examine their holdings. All user and trade data is stored in this contract and it is the only contract in the system besides CoinvestToken.sol that users may interact with.
 </br>
 <h2>Bank.sol</h2>
-</br>
 The Bank contract holds all user funds that are invested. They are held here so that in the case where Investment needs an upgrade, user funds are not disturbed. Only Investment may transfer funds out of bank and it will only ever be able to do that when a user is liquidating assets. The Coinvest team will never be able to withdraw funds from the Bank.
 </br>
 <h2>Oracle.sol</h2>
-</br>
 The Oracle contract uses Oraclize to get current market price data on the supported cryptonized assets. It currently gets data from cryptocompare.com every 60 seconds and contacts Investment to update the prices so user's can invest at the going rates.
 </br>
 </br>
