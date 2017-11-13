@@ -1,8 +1,8 @@
 pragma solidity ^0.4.17;
+import './SafeMath.sol';
+import './Privileged.sol';
 import './Bank.sol';
-import '../Math/SafeMath.sol';
-import '../Ownership/Privileged.sol';
-import '../Token/CoinvestToken.sol';
+import './CoinvestToken.sol';
 
 /**
  * @title Investment
@@ -28,6 +28,7 @@ contract Investment is Privileged {
     
     event Invest(address indexed buyer, uint256[] indexed cryptoIds, uint256[] amounts, bool[] indexed shorts, address broker);
     event Liquidate(address indexed seller, uint256[] indexed cryptoIds, uint256[] amounts, bool[] indexed shorts, address broker);
+    event PriceChange(uint256 indexed cryptoId, uint256 indexed price);
     
     /**
      * @dev CryptoAsset represents all the information of a supported crpto.
@@ -125,47 +126,6 @@ contract Investment is Privileged {
         return true;
     }
     
-/** ********************************** Constants ************************************** **/
-    
-    /**
-     * @dev holdings is used to find a user's total worth.
-     * @param _user The user whose holdings should be checked.
-     * @return coinValue The combined COIN value of all of a user's holdings.
-    **/
-    function holdings(address _user)
-      external
-      constant
-    returns (uint256 coinValue)
-    {
-        for (uint256 i = 0; i < totalCryptos; i++) {
-            for (uint256 j = 0; j < userHoldings[_user][i].length; j++) 
-            {
-                Holding memory holding = userHoldings[_user][i][j];
-                if (holding.short) {
-                    coinValue += calculateShortValue(holding.cryptoId, holding.amount, holding.investAmount);
-                } else {
-                    coinValue += calculateCoinValue(holding.cryptoId, holding.amount);
-                }
-            }
-        }
-        return coinValue;
-    }
-    
-    /**
-     * @dev holdingLength is used to find the amount of trades a user has for each crypto.
-     * @dev This is used by frontends so they can look through each trade separately.
-     * @param _user The desired address to check trades of.
-     * @param _cryptoId The desired cryptonized asset to check trades of.
-     * @return length The number of trades a user has executed for this specific crypto.
-    **/
-    function holdingLength(address _user, uint256 _cryptoId)
-      external
-      constant
-    returns (uint256 length)
-    {
-        return userHoldings[_user][_cryptoId].length;
-    }
-    
 /** ********************************** Internal ************************************** **/
     
     /**
@@ -195,7 +155,7 @@ contract Investment is Privileged {
      * @param _beneficiary The address of the investor.
      * @param _cryptoId The unique ID of the crypto to sell/cover.
      * @param _amount The amount (in crypto wei!) to sell/cover.
-     * @param _short Whether or not whether this liquidation is a short.
+     * @param _short Whether or not this liquidation is a short.
      * @return withdrawAmount The COIN value of this liquidation.
     **/
     function sell(address _beneficiary, uint256 _cryptoId, uint256 _amount, bool _short) 
@@ -206,9 +166,7 @@ contract Investment is Privileged {
         uint256 amountSold;
 
         for (uint256 i = 0; i < userHoldings[_beneficiary][_cryptoId].length; i++) {
-            if (amountSold >= _amount) return withdrawAmount;
-            
-            Holding memory holding = userHoldings[_beneficiary][_cryptoId][i];
+            Holding storage holding = userHoldings[_beneficiary][_cryptoId][i];
             uint256 tradeAmount = holding.amount;
             amountSold += tradeAmount;
 
@@ -223,17 +181,16 @@ contract Investment is Privileged {
             }
     
             // Subtract the amount sold from the trade.
-            holding.amount = holding.amount.sub(sellAmount);
+            userHoldings[_beneficiary][_cryptoId][i].amount -= sellAmount;
 
             // We need this percent to find the original investment amount of a fraction of a trade.
             uint256 investPercent = sellAmount * 0xffffff / tradeAmount;
             uint256 investAmount = holding.investAmount * investPercent / 0xffffff;
             
-            if (_short) withdrawAmount += calculateShortValue(_cryptoId, investAmount, sellAmount);
-            else withdrawAmount += calculateCoinValue(_cryptoId, sellAmount);
-
-            // If balance is decremented to 0, remove this trade from userHoldings.            
-            if (holding.amount == 0) delete userHoldings[_beneficiary][_cryptoId][i];
+            if (_short && holding.short) withdrawAmount += calculateShortValue(_cryptoId, investAmount, sellAmount);
+            else if (!_short && !holding.short) withdrawAmount += calculateCoinValue(_cryptoId, sellAmount);
+            
+            userHoldings[_beneficiary][_cryptoId][i].amount -= investAmount;
         }
         return withdrawAmount;
     }
@@ -282,24 +239,64 @@ contract Investment is Privileged {
         return coinAmount;
     }
     
-/** ********************************* Only Oracle *********************************** **/
+/** ********************************** Constants ************************************** **/
     
     /**
-     * @dev Oracle sets the current market price for all used cryptos.
-     * @param _cryptoIds Market symbols of the cryptos.
-     * @param _prices The new market prices of the cryptos.
+     * @dev holdings is used to find a user's total worth.
+     * @param _user The user whose holdings should be checked.
+     * @return coinValue The combined COIN value of all of a user's holdings.
     **/
-    function setPrices(uint256[] _cryptoIds, uint256[] _prices)
+    function holdings(address _user)
+      external
+      constant
+    returns (uint256 coinValue)
+    {
+        for (uint256 i = 0; i < totalCryptos; i++) {
+            for (uint256 j = 0; j < userHoldings[_user][i].length; j++) 
+            {
+                Holding memory holding = userHoldings[_user][i][j];
+                if (holding.short) {
+                    coinValue += calculateShortValue(holding.cryptoId, holding.amount, holding.investAmount);
+                } else {
+                    coinValue += calculateCoinValue(holding.cryptoId, holding.amount);
+                }
+            }
+        }
+        return coinValue;
+    }
+    
+    /**
+     * @dev holdingLength is used to find the amount of trades a user has for each crypto.
+     * @dev This is used by frontends so they can look through each trade separately.
+     * @param _user The desired address to check trades of.
+     * @param _cryptoId The desired cryptonized asset to check trades of.
+     * @return length The number of trades a user has executed for this specific crypto.
+    **/
+    function holdingLength(address _user, uint256 _cryptoId)
+      external
+      constant
+    returns (uint256 length)
+    {
+        return userHoldings[_user][_cryptoId].length;
+    }
+    
+/** ********************************* Only Oracle *********************************** **/
+
+    /**
+     * @dev Oracle sets the current market price for all used cryptos.
+     * @param _cryptoId Market symbols of the cryptos.
+     * @param _price The new market prices of the cryptos.
+    **/
+    function setPrice(uint256 _cryptoId, uint256 _price)
       external
       onlyPrivileged
     returns (bool success)
     {
-        require(_cryptoIds.length == _prices.length);
+        require(_price > 0);
+        require(cryptoAssets[_cryptoId].price > 0);
         
-        for (uint256 i = 0; i < _cryptoIds.length; i++) {
-            require(cryptoAssets[_cryptoIds[i]].price > 0);
-            cryptoAssets[_cryptoIds[i]].price = _prices[i];
-        }
+        cryptoAssets[_cryptoId].price = _price;
+        PriceChange(_cryptoId, _price);
         return true;
     }
     
