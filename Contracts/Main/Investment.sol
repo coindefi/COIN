@@ -90,9 +90,9 @@ contract Investment is Privileged {
             // Execute a single buy for each of the desired buys/shorts.
             investAmount += buy(_beneficiary, _cryptoIds[i], _amounts[i], _shorts[i]);
         }
-        //uint256 fee = investAmount / 1000;
-        //assert(token.transferFrom(msg.sender, owner, fee));
-        //assert(token.transferFrom(msg.sender, bank, investAmount - fee));
+        uint256 fee = investAmount / 1000;
+        assert(token.transferFrom(msg.sender, owner, fee));
+        assert(token.transferFrom(msg.sender, bank, investAmount.sub(fee)));
        
         Invest(_beneficiary, _cryptoIds, _amounts, _shorts, msg.sender);
         return true;
@@ -118,10 +118,10 @@ contract Investment is Privileged {
             require(_amounts[i] > 0);
             withdrawAmount += sell(_beneficiary, _cryptoIds[i], _amounts[i], _shorts[i]);
         }
-        //uint256 fee = withdrawAmount / 1000;
-        //assert(bank.transfer(owner, fee));
-        //assert(bank.transfer(_beneficiary, withdrawAmount - fee));
-        
+        uint256 fee = withdrawAmount / 1000;
+        assert(bank.transfer(owner, fee));
+        assert(bank.transfer(_beneficiary, withdrawAmount.sub(fee)));
+
         Liquidate(_beneficiary, _cryptoIds, _amounts, _shorts, msg.sender);
         return true;
     }
@@ -166,7 +166,10 @@ contract Investment is Privileged {
         uint256 amountSold;
 
         for (uint256 i = 0; i < userHoldings[_beneficiary][_cryptoId].length; i++) {
-            Holding storage holding = userHoldings[_beneficiary][_cryptoId][i];
+            Holding memory holding = userHoldings[_beneficiary][_cryptoId][i];
+            if (holding.short != _short) continue;
+            if (holding.amount == 0) continue;
+            
             uint256 tradeAmount = holding.amount;
             amountSold += tradeAmount;
 
@@ -174,23 +177,23 @@ contract Investment is Privileged {
             uint256 sellAmount;
 
             // If we've exceeded the total amount to be sold, sell only a fraction of the trade
-            if (amountSold >= _amount) {
+            if (amountSold > _amount) {
                 sellAmount = tradeAmount.sub(amountSold - _amount);
             } else {
                 sellAmount = tradeAmount;
             }
     
             // Subtract the amount sold from the trade.
-            userHoldings[_beneficiary][_cryptoId][i].amount -= sellAmount;
+            userHoldings[_beneficiary][_cryptoId][i].amount = userHoldings[_beneficiary][_cryptoId][i].amount.sub(sellAmount);
 
             // We need this percent to find the original investment amount of a fraction of a trade.
             uint256 investPercent = sellAmount * 0xffffff / tradeAmount;
             uint256 investAmount = holding.investAmount * investPercent / 0xffffff;
             
-            if (_short && holding.short) withdrawAmount += calculateShortValue(_cryptoId, investAmount, sellAmount);
-            else if (!_short && !holding.short) withdrawAmount += calculateCoinValue(_cryptoId, sellAmount);
-            
-            userHoldings[_beneficiary][_cryptoId][i].amount -= investAmount;
+            if (_short) withdrawAmount += calculateShortValue(_cryptoId, investAmount, sellAmount);
+            else withdrawAmount += calculateCoinValue(_cryptoId, sellAmount);
+        
+            userHoldings[_beneficiary][_cryptoId][i].investAmount = userHoldings[_beneficiary][_cryptoId][i].investAmount.sub(investAmount);
         }
         return withdrawAmount;
     }
@@ -235,7 +238,7 @@ contract Investment is Privileged {
         uint256 currentValue = calculateCoinValue(_cryptoId, _amount);
 
         // If current value is greater than original value * 2, the value of the short is 0.
-        if (_investAmount * 2 >= currentValue) coinAmount = _investAmount * 2 - currentValue;
+        if (_investAmount * 2 >= currentValue) coinAmount = (_investAmount * 2).sub(currentValue);
         return coinAmount;
     }
     
