@@ -2,20 +2,21 @@ pragma solidity ^0.4.17;
 import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
 import "github.com/Arachnid/solidity-stringutils/strings.sol";
 import "./Investment.sol";
-import "../Ownership/Privileged.sol";
+import "./Privileged.sol";
+
 /**
  * @title Oracle
  * @dev This contract queries cryptocompare every 60 seconds
  * @dev to find the most recent prices for all investable cryptos.
- * @notice This will be changed in the future to query all cryptos at once.
 */
 
 contract Oracle is usingOraclize, Privileged {
     using strings for *;
     
+    uint256 public thisPrice;
     Investment investContract;
-    address public owner; // Owner is able to add new cryptos to find price for
-    mapping (string => string) symbolUrls; // Symbol ("COIN") of the crypto to search
+    mapping (string => string) symbolUrls; // Symbol ("COIN") of the crypto to search and URL to search
+    mapping (string => uint256) symbolIds; // Find the crypto ID of the given symbol string
     
     event newOraclizeQuery(string description);
     event newPrice(string symbol, uint256 price);
@@ -39,11 +40,12 @@ contract Oracle is usingOraclize, Privileged {
         string memory symbol = findSymbol(result);
         uint256 price = findPrice(result);
         newPrice(symbol, price);
-        
-        investContract.setPrices([symbol],[price]);
+        thisPrice = price;
+    
+        investContract.setPrice(symbolIds[symbol], price);
         update(symbol);
     }
-
+    
     function update(string _symbol) payable {
         string _url = symbolUrls[_symbol];
         if (oraclize.getPrice("URL") > this.balance) {
@@ -55,19 +57,21 @@ contract Oracle is usingOraclize, Privileged {
     }
     
 /** ****************************** Only Owner *********************************** **/
-    
+
     /**
      * @dev Owner can add a new crypto to the update list.
      * @dev In the future this can also add crypto to Investment contract.
      * @param _symbol The symbol (i.e. COIN) to be added to the list (all caps).
      * @param _url The URL that should be scraped to find the price (encased in json()).
     **/
-    function updateUrls(string _symbol, string _url)
+    function updateUrls(string _symbol, string _url, uint256 _cryptoId)
       external
       onlyOwner
     returns (bool success)
     {
         symbolUrls[_symbol] = _url;
+        symbolIds[_symbol] = _cryptoId;
+        return true;
     }
     
 /** ******************************** Internal *********************************** **/
@@ -105,7 +109,7 @@ contract Oracle is usingOraclize, Privileged {
         s.rsplit('}'.toSlice(), part);
     
         var sString = s.toString();
-        newPrice = parseInt(sString, 5);
+        newPrice = parseInt(sString, 18);
         return newPrice;
     }
  
