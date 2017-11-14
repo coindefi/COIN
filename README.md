@@ -48,4 +48,26 @@ Coinvest has put extreme emphasis on the security of our users. We've spent much
 </br>
 </br>
 This means no one can switch out the contracts to begin with--even to upgrade them. We will keep this secure but non-upgradeable version of the system until we launch our DAO, at which point we will liquidate all user funds to their addresses and stop using the initial contracts. We will then launch the contracts again with the DAO as an owner so the community will be able to decide on upgrades from then on. We will never again have to liquidate all user funds and have them reinvest once the system is owned by our DAO.
+</br>
+</br>
+<h2>Unique crypto IDs for the contract:</h2>
+0: COIN
+</br>
+1: BTC
+</br>
+2: ETH
+</br>
+3: XRP
+</br>
+4: LTC
+</br>
+5: DASH
+</br>
+6: BCH
+</br>
+7: XMR
+</br>
+8: XEM
+</br>
+9: EOS
 
