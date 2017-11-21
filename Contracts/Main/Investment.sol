@@ -1,8 +1,8 @@
 pragma solidity ^0.4.17;
-import './SafeMath.sol';
-import './Privileged.sol';
+import '../Math/SafeMath.sol';
+import '../Ownership/Privileged.sol';
 import './Bank.sol';
-import './CoinvestToken.sol';
+import '../Token/CoinvestToken.sol';
 
 /**
  * @title Investment
@@ -63,6 +63,7 @@ contract Investment is Privileged {
     {
         bank = Bank(_bankAddress);
         token = CoinvestToken(_tokenAddress);
+        initialCryptos();
     }
     
 /** ********************************** External ************************************* **/
@@ -90,9 +91,9 @@ contract Investment is Privileged {
             // Execute a single buy for each of the desired buys/shorts.
             investAmount += buy(_beneficiary, _cryptoIds[i], _amounts[i], _shorts[i]);
         }
-        uint256 fee = investAmount / 1000;
-        assert(token.transferFrom(msg.sender, owner, fee));
-        assert(token.transferFrom(msg.sender, bank, investAmount.sub(fee)));
+        //uint256 fee = investAmount / 1000;
+        //assert(token.transferFrom(msg.sender, owner, fee));
+        //assert(token.transferFrom(msg.sender, bank, investAmount - fee));
        
         Invest(_beneficiary, _cryptoIds, _amounts, _shorts, msg.sender);
         return true;
@@ -118,9 +119,9 @@ contract Investment is Privileged {
             require(_amounts[i] > 0);
             withdrawAmount += sell(_beneficiary, _cryptoIds[i], _amounts[i], _shorts[i]);
         }
-        uint256 fee = withdrawAmount / 1000;
-        assert(bank.transfer(owner, fee));
-        assert(bank.transfer(_beneficiary, withdrawAmount.sub(fee)));
+        //uint256 fee = withdrawAmount / 1000;
+        //assert(bank.transfer(owner, fee));
+        //assert(bank.transfer(_beneficiary, withdrawAmount - fee));
 
         Liquidate(_beneficiary, _cryptoIds, _amounts, _shorts, msg.sender);
         return true;
@@ -287,19 +288,19 @@ contract Investment is Privileged {
 
     /**
      * @dev Oracle sets the current market price for all used cryptos.
-     * @param _cryptoId Market symbols of the cryptos.
-     * @param _price The new market prices of the cryptos.
+     * @param _prices Array of the new prices for each crypto.
     **/
-    function setPrice(uint256 _cryptoId, uint256 _price)
+    function setPrices(uint256[9] _prices)
       external
       onlyPrivileged
     returns (bool success)
     {
-        require(_price > 0);
-        require(cryptoAssets[_cryptoId].price > 0);
-        
-        cryptoAssets[_cryptoId].price = _price;
-        PriceChange(_cryptoId, _price);
+        for (uint256 i = 0; i < 9; i++) {
+            require(cryptoAssets[i + 1].price > 0);
+    
+            cryptoAssets[i + 1].price = _prices[i];
+            PriceChange(i + 1, _prices[i]);
+        }
         return true;
     }
     
@@ -312,7 +313,7 @@ contract Investment is Privileged {
      * @param _price Current market price to begin the crypto selling at.
     **/
     function addCrypto(uint256 _cryptoId, string _symbol, uint256 _price, uint256 _decimals)
-      external
+      public
       onlyOwner
     returns (bool success)
     {
@@ -322,6 +323,24 @@ contract Investment is Privileged {
         cryptoAssets[_cryptoId] = crypto;
         totalCryptos++;
         return true;
+    }
+    
+    /**
+     * @dev Run on construction so I don't need to add all these by hand.
+    **/
+    function initialCryptos() 
+      internal 
+    {
+        addCrypto(0, "COIN", 10 ** 18, 18);
+        addCrypto(1, "BTC", 1, 8);
+        addCrypto(2, "ETH", 1, 18);
+        addCrypto(3, "XRP", 1, 6);
+        addCrypto(4, "LTC", 1, 8);
+        addCrypto(5, "DASH", 1, 8);
+        addCrypto(6, "BCH", 1, 8);
+        addCrypto(7, "XMR", 1, 12);
+        addCrypto(8, "XEM", 1, 6);
+        addCrypto(9, "EOS", 1, 18);
     }
     
     /**
