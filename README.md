@@ -2,7 +2,7 @@
 Coinvest is a decentralized stock exchange that allows users to invest in an array of cryptocurrencies in a very simple manner. When a user wants to make a trade, the Coinvest Token ("COIN") is sent to the contract along with a list of the cryptonized assets the user would like to invest in. The amounts and prices of purchased assets are recorded in USD and when a user would like to liquidate their holdings, they follow the same process of selling a certain amount of chosen assets and their address is returned COIN in the USD value of the profits earned. This will all be handled through the easy-to-use Coinvest frontend so now anyone can invest in cryptocurrencies.
 </br>
 </br>
-The Ropsten test network Investment contract address is: 0x2e6d78558b6287f0f3fadc4814550f55234aac2f.
+The Ropsten test network Investment contract address is: 0xc37ce71df43f39395149894bcc243caf8fa9519a.
 </br>
 Do not send anything on the main network to this address!
 </br>
