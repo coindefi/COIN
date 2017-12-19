@@ -9,8 +9,8 @@ contract CoinvestToken {
     string public constant name = "Coinvest";
     
     // Storing small numbers is cheaper.
-    uint public constant decimals = 18;
-    uint _totalSupply = 1000000 * (10 ** 18);
+    uint256 public constant decimals = 18;
+    uint256 _totalSupply = 1000000 * (10 ** 18);
 
     // Balances for each account
     mapping(address => uint256) balances;
@@ -89,6 +89,7 @@ contract CoinvestToken {
         balances[_to] += _amount;
         
         Transfer(_from, _to, _amount);
+        return true;
     }
 
     /**
