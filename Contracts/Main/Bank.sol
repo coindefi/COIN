@@ -15,7 +15,7 @@ contract Bank is Privileged {
     /**
      * @param _coinvestToken address of the Coinvest token.
     **/
-    function Users(address _coinvestToken)
+    function Bank(address _coinvestToken)
       public
     {
         coinvestToken = CoinvestToken(_coinvestToken);
