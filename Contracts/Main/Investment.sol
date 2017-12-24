@@ -91,11 +91,12 @@ contract Investment is Privileged {
             // Execute a single buy for each of the desired buys/shorts.
             investAmount += buy(_beneficiary, _cryptoIds[i], _amounts[i], _shorts[i]);
         }
+        // $1 USD = 10 ** 18 and we have a fee of $4.99
         //uint256 fee = 4990000000000000000 * (10 ** 18) / cryptoAssets[0].price;
         //require(withdrawAmount >= fee); 
         
-        //assert(bank.transfer(owner, fee));
-        //assert(bank.transfer(_beneficiary, withdrawAmount - fee));
+-       //assert(token.transferFrom(_beneficiary, owner, fee));
+-       //assert(token.transferFrom(_beneficiary, bank, investAmount - fee));
         
         Invest(_beneficiary, _cryptoIds, _amounts, _shorts, msg.sender);
         return true;
@@ -121,7 +122,6 @@ contract Investment is Privileged {
             require(_amounts[i] > 0);
             withdrawAmount += sell(_beneficiary, _cryptoIds[i], _amounts[i], _shorts[i]);
         }
-        // $1 USD = 10 ** 18 and we have a fee of $4.99
         //uint256 fee = 4990000000000000000 * (10 ** 18) / cryptoAssets[0].price;
         //require(withdrawAmount >= fee); 
         
