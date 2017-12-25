@@ -41,7 +41,13 @@ contract CoinvestToken is SafeMath {
     
     address public maintainer = msg.sender;
     
+    bool public ERC223Transfer_enabled = false;
+    bool public Transfer_data_enabled = false;
+    bool public Transfer_nodata_enabled = true;
+    
     event Transfer(address indexed from, address indexed to, uint value, bytes data);
+    event ERC223Transfer(address indexed from, address indexed to, uint value, bytes data);
+    event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed _from, address indexed _spender, uint indexed _amount);
 
     mapping(address => uint) balances;
@@ -74,7 +80,18 @@ contract CoinvestToken is SafeMath {
             balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
             balances[_to] = safeAdd(balanceOf(_to), _value);
             assert(_to.call.value(0)(bytes4(sha3(_custom_fallback)), msg.sender, _value, _data));
-            Transfer(msg.sender, _to, _value, _data);
+            if(Transfer_data_enabled)
+            {
+                Transfer(msg.sender, _to, _value, _data);
+            }
+            if(Transfer_nodata_enabled)
+            {
+                Transfer(msg.sender, _to, _value);
+            }
+            if(ERC223Transfer_enabled)
+            {
+                ERC223Transfer(msg.sender, _to, _value, _data);
+            }
             return true;
         }
         else {
@@ -128,7 +145,18 @@ contract CoinvestToken is SafeMath {
         if (balanceOf(msg.sender) < _value) throw;
         balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
         balances[_to] = safeAdd(balanceOf(_to), _value);
-        Transfer(msg.sender, _to, _value, _data);
+        if(Transfer_data_enabled)
+        {
+            Transfer(msg.sender, _to, _value, _data);
+        }
+        if(Transfer_nodata_enabled)
+        {
+            Transfer(msg.sender, _to, _value);
+        }
+        if(ERC223Transfer_enabled)
+        {
+            ERC223Transfer(msg.sender, _to, _value, _data);
+        }
         return true;
     }
   
@@ -139,7 +167,18 @@ contract CoinvestToken is SafeMath {
         balances[_to] = safeAdd(balanceOf(_to), _value);
         ContractReceiver receiver = ContractReceiver(_to);
         receiver.tokenFallback(msg.sender, _value, _data);
-        Transfer(msg.sender, _to, _value, _data);
+        if(Transfer_data_enabled)
+        {
+            Transfer(msg.sender, _to, _value, _data);
+        }
+        if(Transfer_nodata_enabled)
+        {
+            Transfer(msg.sender, _to, _value);
+        }
+        if(ERC223Transfer_enabled)
+        {
+            ERC223Transfer(msg.sender, _to, _value, _data);
+        }
         return true;
     }
 
@@ -195,6 +234,21 @@ contract CoinvestToken is SafeMath {
     returns (uint256) 
     {
         return allowed[_owner][_spender];
+    }
+    
+    function adjust_ERC223Transfer(bool _value) only_maintainer
+    {
+        ERC223Transfer_enabled = _value;
+    }
+    
+    function adjust_Transfer_nodata(bool _value) only_maintainer
+    {
+        Transfer_nodata_enabled = _value;
+    }
+    
+    function adjust_Transfer_data(bool _value) only_maintainer
+    {
+        Transfer_data_enabled = _value;
     }
     
     modifier only_maintainer
