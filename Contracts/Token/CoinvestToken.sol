@@ -38,6 +38,9 @@ contract SafeMath {
 }
  
 contract CoinvestToken is SafeMath {
+    
+    address public maintainer = msg.sender;
+    
     event Transfer(address indexed from, address indexed to, uint value, bytes data);
     event Approval(address indexed _from, address indexed _spender, uint indexed _amount);
 
@@ -192,5 +195,11 @@ contract CoinvestToken is SafeMath {
     returns (uint256) 
     {
         return allowed[_owner][_spender];
+    }
+    
+    modifier only_maintainer
+    {
+        assert(msg.sender == maintainer);
+        _;
     }
 }
