@@ -160,8 +160,9 @@ contract CoinvestToken is SafeMath {
         allowed[_from][msg.sender] -= _amount;
         balances[_from] -= _amount;
         balances[_to] += _amount;
+        bytes memory empty;
         
-        Transfer(_from, _to, _amount);
+        Transfer(_from, _to, _amount, empty);
         return true;
     }
 
