@@ -23,7 +23,7 @@ contract ICO {
     
     function() payable {
         assert(block.number < end_block && block.number > start_block);
-        
+        token.transfer(msg.sender, msg.value);
         Buy(msg.sender, msg.value);
     }
     
