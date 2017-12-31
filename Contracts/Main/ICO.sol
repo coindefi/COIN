@@ -1,10 +1,6 @@
 pragma solidity ^0.4.15;
 
 import './SafeMath.sol';
- 
-contract ContractReceiver {
-    function tokenFallback(address _from, uint _value, bytes _data);
-}
 
 contract CoinvestToken {
     function transfer(address _to, uint256 _amount);
@@ -40,10 +36,16 @@ contract ICO {
         end_block = _end_block;
     }
     
+    function adjust_price(uint256 _price) only_owner
+    {
+        price = _price;
+    }
+    
     function withdraw() only_owner
     {
         owner.send(this.balance);
     }
+    
     
     modifier only_owner
     {
