@@ -15,6 +15,8 @@ contract ICO {
     address public token_address; // << Replace with token contract address
     CoinvestToken token = CoinvestToken(token_address);
     
+    uint256 public max_contribution = 500e18;
+    
     uint256 public constant price = 2058; // Amount of tokens to be sent per each WEI(ETH) contributed.
     /**
      * NOTE: The `price` should be calculated as follows:
@@ -28,6 +30,7 @@ contract ICO {
     uint256 public end_block = block.number + 172800;
     
     function() payable {
+        assert(msg.value <= max_contribution);
         assert(block.number < end_block && block.number > start_block);
         token.transfer(msg.sender, (msg.value * price));
         Buy(msg.sender, msg.value);
