@@ -15,7 +15,7 @@ contract ICO {
     address public token_address; // << Replace with token contract address
     CoinvestToken token = CoinvestToken(token_address);
     
-    uint256 public max_contribution = 500e18;
+    uint256 public max_contribution = 50e18; // Whale protection: 50 ETH max deposit
     
     uint256 public constant price = 2058; // Amount of tokens to be sent per each WEI(ETH) contributed.
     /**
