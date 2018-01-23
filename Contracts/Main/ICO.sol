@@ -11,7 +11,7 @@ contract ICO {
     
     event Buy(address indexed _owner, uint256 indexed _amount);
     
-    address public owner; // << Replace with address
+    address public owner = msg.sender; // << Replace with proper address
     address public token_address; // << Replace with token contract address
     CoinvestToken token = CoinvestToken(token_address);
     
@@ -61,6 +61,11 @@ contract ICO {
     function withdraw_token() only_owner
     {
         token.transfer(msg.sender, token.balanceOf(this));
+    }
+    
+    function set_token_address(address _token) only_owner
+    {
+        token_address = _token;
     }
     
     
