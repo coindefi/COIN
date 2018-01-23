@@ -55,7 +55,7 @@ contract ICO {
     
     function withdraw() only_owner
     {
-        owner.send(this.balance);
+        owner.transfer(this.balance);
     }
     
     function withdraw_token() only_owner
