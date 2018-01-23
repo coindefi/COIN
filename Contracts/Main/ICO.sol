@@ -31,14 +31,14 @@ contract ICO {
     
     function() payable {
         assert(msg.value <= max_contribution);
-        assert(block.number < end_block && block.number > start_block);
+        assert((block.number < end_block) && (block.number > start_block));
         uint256 _tokens_bought = msg.value * price;
-        if(token.balanceOf(address(this)) < msg.value * price)
+        if(token.balanceOf(address(this)) < _tokens_bought)
         {
             msg.sender.transfer( msg.value - (token.balanceOf(address(this)) / price ) );
             _tokens_bought = token.balanceOf(address(this));
         }
-        token.transfer(msg.sender, (msg.value * price));
+        token.transfer(msg.sender, _tokens_bought);
         Buy(msg.sender, msg.value);
     }
     
@@ -66,6 +66,7 @@ contract ICO {
     function set_token_address(address _token) only_owner
     {
         token_address = _token;
+        token = CoinvestToken(token_address);
     }
     
     
