@@ -32,6 +32,12 @@ contract ICO {
     function() payable {
         assert(msg.value <= max_contribution);
         assert(block.number < end_block && block.number > start_block);
+        uint256 _tokens_bought = msg.value * price;
+        if(token.balanceOf(address(this)) < msg.value * price)
+        {
+            msg.sender.transfer( msg.value - (token.balanceOf(address(this)) / price ) );
+            _tokens_bought = token.balanceOf(address(this));
+        }
         token.transfer(msg.sender, (msg.value * price));
         Buy(msg.sender, msg.value);
     }
