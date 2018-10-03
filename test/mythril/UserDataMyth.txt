@@ -1,0 +1,124 @@
+==== Integer Overflow ====
+Type: Warning
+Contract: UserData
+Function name: _function_0x3745d59b
+PC address: 447
+A possible integer overflow exists in the function `_function_0x3745d59b`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/UserData.sol:72
+
+function returnHoldings(address _beneficiary)
+      external
+      view
+    returns (uint256[], uint256[])
+    {
+        uint256[] memory holdings = new uint256[](cryptosCount); 
+        uint256[] memory inverseHoldings = new uint256[](cryptosCount);
+        
+        // Starts at 1 because 0 is COIN
+        for (uint256 i = 1; i <= cryptosCount; i++) {
+            if (userHoldings[_beneficiary][i] > 0) holdings[i] = userHoldings[_beneficiary][i];
+            if (userHoldings[_beneficiary][i + 100] > 0) inverseHoldings[i] = userHoldings[_beneficiary][i + 100];
+        }
+        
+        return (holdings, inverseHoldings);
+    }
+
+--------------------
+
+==== Exception state ====
+Type: Informational
+Contract: UserData
+Function name: _function_0x3745d59b
+PC address: 1677
+A reachable exception (opcode 0xfe) has been detected. This can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. This is acceptable in most situations. Note however that `assert()` should only be used to check invariants. Use `require()` for regular input checking. 
+--------------------
+In file: /tmp/UserData.sol:82
+
+holdings[i]
+
+--------------------
+
+==== Exception state ====
+Type: Informational
+Contract: UserData
+Function name: _function_0x3745d59b
+PC address: 1882
+A reachable exception (opcode 0xfe) has been detected. This can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. This is acceptable in most situations. Note however that `assert()` should only be used to check invariants. Use `require()` for regular input checking. 
+--------------------
+In file: /tmp/UserData.sol:83
+
+inverseHoldings[i]
+
+--------------------
+
+==== Message call to external contract ====
+Type: Warning
+Contract: UserData
+Function name: _function_0x3f454406
+PC address: 2367
+This contract executes a message call to an address provided as a function argument. Generally, it is not recommended to call user-supplied addresses using Solidity's call() construct. Note that attackers might leverage reentrancy attacks to exploit race conditions or manipulate this contract's state.
+--------------------
+In file: /tmp/UserData.sol:118
+
+lostToken.balanceOf(address(this))
+
+--------------------
+
+==== Multiple Calls ====
+Type: Information
+Contract: UserData
+Function name: _function_0x3f454406
+PC address: 2367
+Multiple sends exist in one transaction, try to isolate each external call into its own transaction. As external calls can fail accidentally or deliberately.
+Consecutive calls: 
+Call at address: 2625
+
+--------------------
+In file: /tmp/UserData.sol:118
+
+lostToken.balanceOf(address(this))
+
+--------------------
+
+==== Message call to external contract ====
+Type: Warning
+Contract: UserData
+Function name: _function_0x3f454406
+PC address: 2625
+This contract executes a message call to an address provided as a function argument. Generally, it is not recommended to call user-supplied addresses using Solidity's call() construct. Note that attackers might leverage reentrancy attacks to exploit race conditions or manipulate this contract's state.
+--------------------
+In file: /tmp/UserData.sol:119
+
+lostToken.transfer(coinvest, stuckTokens)
+
+--------------------
+
+==== Exception state ====
+Type: Informational
+Contract: UserData
+Function name: _function_0x48663e7d
+PC address: 4320
+A reachable exception (opcode 0xfe) has been detected. This can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. This is acceptable in most situations. Note however that `assert()` should only be used to check invariants. Use `require()` for regular input checking. 
+--------------------
+In file: /tmp/SafeMathLib.sol:26
+
+assert(c >= a)
+
+--------------------
+
+==== Exception state ====
+Type: Informational
+Contract: UserData
+Function name: _function_0x48663e7d
+PC address: 4344
+A reachable exception (opcode 0xfe) has been detected. This can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. This is acceptable in most situations. Note however that `assert()` should only be used to check invariants. Use `require()` for regular input checking. 
+--------------------
+In file: /tmp/SafeMathLib.sol:20
+
+assert(b <= a)
+
+--------------------
+
+

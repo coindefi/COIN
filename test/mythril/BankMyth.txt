@@ -1,0 +1,56 @@
+==== Message call to external contract ====
+Type: Warning
+Contract: Bank
+Function name: _function_0x3f454406
+PC address: 1448
+This contract executes a message call to an address provided as a function argument. Generally, it is not recommended to call user-supplied addresses using Solidity's call() construct. Note that attackers might leverage reentrancy attacks to exploit race conditions or manipulate this contract's state.
+--------------------
+In file: /tmp/Bank.sol:63
+
+lostToken.balanceOf(address(this))
+
+--------------------
+
+==== Multiple Calls ====
+Type: Information
+Contract: Bank
+Function name: _function_0x3f454406
+PC address: 1448
+Multiple sends exist in one transaction, try to isolate each external call into its own transaction. As external calls can fail accidentally or deliberately.
+Consecutive calls: 
+Call at address: 1706
+
+--------------------
+In file: /tmp/Bank.sol:63
+
+lostToken.balanceOf(address(this))
+
+--------------------
+
+==== Message call to external contract ====
+Type: Warning
+Contract: Bank
+Function name: _function_0x3f454406
+PC address: 1706
+This contract executes a message call to an address provided as a function argument. Generally, it is not recommended to call user-supplied addresses using Solidity's call() construct. Note that attackers might leverage reentrancy attacks to exploit race conditions or manipulate this contract's state.
+--------------------
+In file: /tmp/Bank.sol:64
+
+lostToken.transfer(coinvest, stuckTokens)
+
+--------------------
+
+==== Message call to external contract ====
+Type: Informational
+Contract: Bank
+Function name: _function_0xa9059cbb
+PC address: 2176
+This contract executes a message call to to another contract. Make sure that the called contract is trusted and does not execute user-supplied code.
+--------------------
+In file: /tmp/Bank.sol:34
+
+coinvestToken.transfer(_to, _value)
+
+--------------------
+
+

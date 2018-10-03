@@ -1,0 +1,1257 @@
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x519e7e4f
+PC address: 1929
+A possible integer overflow exists in the function `_function_0x519e7e4f`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:407
+
+function bitRec(uint256[] _idsAndAmts) 
+      public
+      pure
+    returns (uint256[], uint256[]) 
+    {
+        uint256[] memory cryptos = new uint256[](_idsAndAmts.length);
+        uint256[] memory amounts = new uint256[](_idsAndAmts.length);
+
+        for (uint256 i = 0; i < _idsAndAmts.length; i++) {
+            cryptos[i] = uint256(uint8(_idsAndAmts[i]));
+            amounts[i] = uint256(uint248(_idsAndAmts[i] >> 8));
+        }
+        return (cryptos, amounts);
+    }
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x519e7e4f
+PC address: 1995
+A possible integer overflow exists in the function `_function_0x519e7e4f`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:407
+
+function bitRec(uint256[] _idsAndAmts) 
+      public
+      pure
+    returns (uint256[], uint256[]) 
+    {
+        uint256[] memory cryptos = new uint256[](_idsAndAmts.length);
+        uint256[] memory amounts = new uint256[](_idsAndAmts.length);
+
+        for (uint256 i = 0; i < _idsAndAmts.length; i++) {
+            cryptos[i] = uint256(uint8(_idsAndAmts[i]));
+            amounts[i] = uint256(uint248(_idsAndAmts[i] >> 8));
+        }
+        return (cryptos, amounts);
+    }
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x0b6355ed
+PC address: 5107
+A possible integer overflow exists in the function `_function_0x0b6355ed`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:327
+
+cryptoSymbols[id].toSlice
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x0b6355ed
+PC address: 5131
+A possible integer overflow exists in the function `_function_0x0b6355ed`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:327
+
+cryptoSymbols[id].toSlice
+
+--------------------
+
+==== Message call to external contract ====
+Type: Informational
+Contract: Investment
+Function name: _function_0x2f714f92
+PC address: 5899
+This contract executes a message call to to another contract. Make sure that the called contract is trusted and does not execute user-supplied code.
+--------------------
+In file: /tmp/Investment.sol:184
+
+bank.transfer(coinvest, fee)
+
+--------------------
+
+==== Multiple Calls ====
+Type: Information
+Contract: Investment
+Function name: _function_0x2f714f92
+PC address: 5899
+Multiple sends exist in one transaction, try to isolate each external call into its own transaction. As external calls can fail accidentally or deliberately.
+Consecutive calls: 
+Call at address: 6188
+
+--------------------
+In file: /tmp/Investment.sol:184
+
+bank.transfer(coinvest, fee)
+
+--------------------
+
+==== Message call to external contract ====
+Type: Informational
+Contract: Investment
+Function name: _function_0x2f714f92
+PC address: 6188
+This contract executes a message call to to another contract. Make sure that the called contract is trusted and does not execute user-supplied code.
+--------------------
+In file: /tmp/Investment.sol:188
+
+bank.transfer(_beneficiary, _coinValue)
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x2f714f92
+PC address: 6463
+A possible integer overflow exists in the function `_function_0x2f714f92`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:191
+
+userData.modifyHoldings(_beneficiary, _cryptoIds, _amounts, false)
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x2f714f92
+PC address: 6529
+A possible integer overflow exists in the function `_function_0x2f714f92`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:191
+
+userData.modifyHoldings(_beneficiary, _cryptoIds, _amounts, false)
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x38bbfa50
+PC address: 7282
+A possible integer overflow exists in the function `_function_0x38bbfa50`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:295
+
+TradeInfo memory tradeInfo = trades[myid]
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x38bbfa50
+PC address: 7284
+A possible integer overflow exists in the function `_function_0x38bbfa50`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:295
+
+TradeInfo memory tradeInfo = trades[myid]
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x38bbfa50
+PC address: 7303
+A possible integer overflow exists in the function `_function_0x38bbfa50`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:295
+
+TradeInfo memory tradeInfo = trades[myid]
+
+--------------------
+
+==== Exception state ====
+Type: Informational
+Contract: Investment
+Function name: _function_0x38bbfa50
+PC address: 7921
+A reachable exception (opcode 0xfe) has been detected. This can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. This is acceptable in most situations. Note however that `assert()` should only be used to check invariants. Use `require()` for regular input checking. 
+--------------------
+In file: /tmp/Investment.sol:416
+
+cryptos[i]
+
+--------------------
+
+==== Exception state ====
+Type: Informational
+Contract: Investment
+Function name: _function_0x38bbfa50
+PC address: 8014
+A reachable exception (opcode 0xfe) has been detected. This can be caused by type errors, division by zero, out-of-bounds array access, or assert violations. This is acceptable in most situations. Note however that `assert()` should only be used to check invariants. Use `require()` for regular input checking. 
+--------------------
+In file: /tmp/Investment.sol:417
+
+amounts[i]
+
+--------------------
+
+==== Message call to external contract ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x68e09ab5
+PC address: 8475
+This contract executes a message call to an address provided as a function argument. Generally, it is not recommended to call user-supplied addresses using Solidity's call() construct. Note that attackers might leverage reentrancy attacks to exploit race conditions or manipulate this contract's state.
+--------------------
+In file: /tmp/Investment.sol:462
+
+lostToken.balanceOf(address(this))
+
+--------------------
+
+==== Multiple Calls ====
+Type: Information
+Contract: Investment
+Function name: _function_0x68e09ab5
+PC address: 8475
+Multiple sends exist in one transaction, try to isolate each external call into its own transaction. As external calls can fail accidentally or deliberately.
+Consecutive calls: 
+Call at address: 8733
+
+--------------------
+In file: /tmp/Investment.sol:462
+
+lostToken.balanceOf(address(this))
+
+--------------------
+
+==== Message call to external contract ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x68e09ab5
+PC address: 8733
+This contract executes a message call to an address provided as a function argument. Generally, it is not recommended to call user-supplied addresses using Solidity's call() construct. Note that attackers might leverage reentrancy attacks to exploit race conditions or manipulate this contract's state.
+--------------------
+In file: /tmp/Investment.sol:463
+
+lostToken.transfer(coinvest, stuckTokens)
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x0b6355ed
+PC address: 13971
+A possible integer overflow exists in the function `_function_0x0b6355ed`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Strings.sol:679
+
+self._len + other._len
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x727c2197
+PC address: 15922
+A possible integer overflow exists in the function `_function_0x727c2197`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:18
+
+contract Investment is Ownable {//, usingOraclize 
+
+    using SafeMathLib for uint256;
+    using strings for *;
+    
+    Bank public bank;
+    UserData public userData;
+    ERC20Interface public token;
+    uint256 public customGasPrice;
+    
+    // Stores all trade info so Oraclize can return and update.
+    // idsAndAmts stores both the crypto ID and amounts with a uint8 and uint248 respectively.
+    struct TradeInfo {
+        uint256[] idsAndAmts;
+        address beneficiary;
+        bool buy;
+    }
+    
+    // Oraclize ID => TradeInfo
+    mapping (bytes32 => TradeInfo) public trades;
+    
+    // Crypto Id => string symbol used for crafting Oraclize URL
+    mapping (uint256 => string) public cryptoSymbols;
+    
+    // Balances of a user's free trades, generally given as reward for DAO voting.
+    mapping (address => uint256) public freeTrades;
+
+    event newOraclizeQuery(string description);
+    event Buy(address indexed buyer, uint256[] cryptoIds, uint256[] amounts, uint256[] prices);
+    event Sell(address indexed seller, uint256[] cryptoIds, uint256[] amounts, uint256[] prices);
+
+/** ********************************** Defaults ************************************* **/
+    
+    /**
+     * @dev Constructor function, construct with coinvest token.
+     * @param _token The address of the Coinvest token.
+     * @param _bank Contract where all of the user Coinvest tokens will be stored.
+     * @param _userData Contract where all of the user balances will be stored.
+    **/
+    function Investment(address _token, address _bank, address _userData)
+      public
+      payable
+    {
+        token = ERC20Interface(_token);
+        bank = Bank(_bank);
+        userData = UserData(_userData);
+
+        //oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
+        
+        cryptoSymbols[1] = "BTC,";
+        cryptoSymbols[2] = "ETH,";
+        cryptoSymbols[3] = "XRP,";
+        cryptoSymbols[4] = "LTC,";
+        cryptoSymbols[5] = "DASH,";
+        cryptoSymbols[6] = "BCH,";
+        cryptoSymbols[7] = "XMR,";
+        cryptoSymbols[8] = "XEM,";
+        cryptoSymbols[9] = "EOS,";
+       
+        customGasPrice = 20000000000;
+        //oraclize_setCustomGasPrice(10000000000);
+    }
+  
+    function()
+      external
+      payable
+    {
+        
+    }
+  
+/** *************************** ApproveAndCall FallBack **************************** **/
+  
+    /**
+     * @dev ApproveAndCall will send us data, we'll determine if the beneficiary is the sender, then we'll call this contract.
+    **/
+    function receiveApproval(address _from, uint256 _amount, address _token, bytes _data) 
+      public
+    {
+        require(msg.sender == address(token));
+        
+        // check here to make sure _from == beneficiary in data
+        address beneficiary;
+        assembly {
+            beneficiary := mload(add(_data,36))
+        }
+        require(_from == beneficiary);
+        
+        require(address(this).delegatecall(_data));
+    }
+  
+/** ********************************** External ************************************* **/
+    
+    /**
+     * @dev User calls to invest, will then call Oraclize and Oraclize adds holdings.
+     * @dev User must first approve this contract to transfer enough tokens to buy.
+     * @param _beneficiary The user making the call whose balance will be updated.
+     * @param _cryptoIds The Ids of the cryptos to invest in.
+     * @param _amounts The amount of each crypto the user wants to buy, delineated in 10 ^ 18 wei.
+    **/
+    function buy(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts)
+      public
+      onlySenderOrToken(_beneficiary)
+    returns (bool success)
+    {
+        require(_cryptoIds.length == _amounts.length);
+        require(getPrices(_beneficiary, _cryptoIds, _amounts, true));
+        return true;
+    }
+    
+    /**
+     * @dev User calls to sell holdings with same parameters as buy.
+    **/
+    function sell(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts)
+      public
+      onlySenderOrToken(_beneficiary)
+    returns (bool success)
+    {
+        require(_cryptoIds.length == _amounts.length);
+        require(getPrices(_beneficiary, _cryptoIds, _amounts, false));
+        return true;
+    }
+    
+/** ********************************** Internal ************************************ **/
+    
+    /**
+     * @dev Broker will call this for an investor to invest in one or multiple assets
+     * @param _beneficiary The address that is being bought for
+     * @param _cryptoIds The list of uint IDs for each crypto to buy
+     * @param _amounts The amounts of each crypto to buy (measured in 10 ** 18 wei!)
+     * @param _prices The price of each bought crypto at time of callback.
+     * @param _coinValue The amount of coin to transferFrom from user.
+    **/
+    function finalizeBuy(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts, uint256[] _prices, uint256 _coinValue)
+      public
+    returns (bool success)
+    {
+        // 1 ether (10 ^ 18) = demo COIN price
+        uint256 fee = 4990000000000000000 * (10 ** 18) / 1 ether;
+        
+        if (freeTrades[_beneficiary] >  0) freeTrades[_beneficiary] = freeTrades[_beneficiary].sub(1);
+        else require(token.transferFrom(_beneficiary, coinvest, fee));
+        
+        require(token.transferFrom(_beneficiary, bank, _coinValue));
+        require(userData.modifyHoldings(_beneficiary, _cryptoIds, _amounts, true));
+
+        Buy(_beneficiary, _cryptoIds, _amounts, _prices);
+        return true;
+    }
+    
+    /**
+     * @param _beneficiary The address that is being sold for
+     * @param _cryptoIds The list of uint IDs for each crypto
+     * @param _amounts The amounts of each crypto to sell (measured in 10 ** 18 wei!)
+     * @param _prices The prices of each crypto at time of callback.
+     * @param _coinValue The amount of COIN to be transferred to user.
+    **/
+    function finalizeSell(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts, uint256[] _prices, uint256 _coinValue)
+      public
+    returns (bool success)
+    {   
+        uint256 fee = 0;
+        if (freeTrades[_beneficiary] > 0) freeTrades[_beneficiary] = freeTrades[_beneficiary].sub(1);
+        else {
+            // 1 ether (10 ^ 18) = demo COIN price
+            fee = 4990000000000000000 * (10 ** 18) / 1 ether;
+            require(_coinValue > fee);
+            require(bank.transfer(coinvest, fee));
+        }
+
+        _coinValue = _coinValue.sub(fee);
+        require(bank.transfer(_beneficiary, _coinValue));
+        
+        // Subtract from balance of each held crypto for user.
+        require(userData.modifyHoldings(_beneficiary, _cryptoIds, _amounts, false));
+        
+        Sell(_beneficiary, _cryptoIds, _amounts, _prices);
+        return true;
+    }
+    
+/** ******************************** Only Owner ************************************* **/
+    
+    /**
+     * @dev Owner may add a crypto to the investment contract.
+     * @param _id Id of the new crypto.
+     * @param _symbol Symbol of the new crypto.
+    **/
+    function addCrypto(uint256 _id, string _symbol)
+      external
+      onlyOwner
+    returns (bool success)
+    {
+        cryptoSymbols[_id] = _symbol;
+        return true;
+    }
+    
+    /**
+     * @dev Allows Coinvest to reward users with free platform trades.
+     * @param _users List of users to reward.
+     * @param _trades List of free trades to give to each.
+    **/
+    function addTrades(address[] _users, uint256[] _trades)
+      external
+      onlyCoinvest
+    {
+        require(_users.length == _trades.length);
+        
+        for (uint256 i = 0; i < _users.length; i++) {
+            freeTrades[_users[i]] = freeTrades[_users[i]].add(_trades[i]);
+        }     
+    }
+
+    /**
+     * @dev Allows owner to change address of other contracts in the system.
+     * @param _token Address of the token contract.
+     * @param _bank Address of the bank contract.
+     * @param _userData Address of the user data contract.
+    **/
+    function changeContracts(address _token, address _bank, address _userData)
+      external
+      onlyOwner
+    returns (bool success)
+    {
+        token = ERC20Interface(_token);
+        bank = Bank(_bank);
+        userData = UserData(_userData);
+    }
+    
+/** ********************************* Modifiers ************************************* **/
+    
+    /**
+     * @dev For buys and sells we only want an approved broker or the buyer/seller
+     * @dev themselves to mess with the buyer/seller's portfolio
+     * @param _beneficiary The buyer or seller whose portfolio is being modified
+    **/
+    modifier onlySenderOrToken(address _beneficiary)
+    {
+        require(msg.sender == _beneficiary || msg.sender == address(token));
+        _;
+    }
+    
+/** ******************************************************************************** **/
+/** ******************************* Oracle Logic *********************************** **/
+/** ******************************************************************************** **/
+
+    /**
+     * @dev Here we Oraclize to CryptoCompare to get prices for these cryptos.
+     * @param _cryptos The IDs of the cryptos to get prices for.
+     * @param _amounts Amount of each crypto to buy.
+     * @param _buy Whether or not this is a buy (as opposed to sell).
+    **/
+    function getPrices(address _beneficiary, uint256[] _cryptos, uint256[] _amounts, bool _buy) 
+      internal
+    returns (bool success)
+    {
+        //if (oraclize_getPrice("URL") > this.balance) {
+        //    newOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
+        //} else {
+        //    newOraclizeQuery("Oraclize query was sent, standing by for the answer..");
+            string memory fullUrl = craftUrl(_cryptos);
+            
+            // Using 0x1 for testing without Oraclize
+            bytes32 queryId = 0x1;
+            
+            //oraclize_query("URL", fullUrl, 100000 * customGasPrice * _cryptos.length);
+            trades[queryId] = TradeInfo(bitConv(_cryptos, _amounts), _beneficiary, _buy);
+        //}
+        return true;
+    }
+    
+    /**
+     * @dev Oraclize calls and should simply set the query array to the int results.
+    **/
+    function __callback(bytes32 myid, string result, bytes proof)
+      public
+    {
+        //if (msg.sender != oraclize_cbAddress()) throw;
+    
+        TradeInfo memory tradeInfo = trades[myid];
+        var (a,b) = bitRec(tradeInfo.idsAndAmts);
+        uint256[] memory cryptos = a;
+        uint256[] memory amounts = b;
+
+        address beneficiary = tradeInfo.beneficiary;
+        bool buy = tradeInfo.buy;
+    
+        uint256[] memory cryptoValues = decodePrices(cryptos, result);
+        uint256 value = calculateValue(amounts, cryptoValues);
+        
+        if (buy) require(finalizeBuy(beneficiary, cryptos, amounts, cryptoValues, value));
+        else require(finalizeSell(beneficiary, cryptos, amounts, cryptoValues, value));
+    }
+    
+/** ******************************* Constants ************************************ **/
+    
+    /**
+     * @dev Crafts URL for Oraclize to grab data from.
+     * @param _cryptos The uint256 crypto ID of the cryptos to search.
+    **/
+    function craftUrl(uint256[] _cryptos)
+      public
+      view
+    returns (string)
+    {
+        var url = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=";
+        for (uint256 i = 0; i < _cryptos.length; i++) {
+            uint256 id = _cryptos[i];
+            if (id > 100) id = id.sub(100);
+
+            require(bytes(cryptoSymbols[id]).length > 0);
+            url = url.toSlice().concat(cryptoSymbols[id].toSlice());
+        }
+        url = url.toSlice().concat("&tsyms=USD".toSlice());
+        return url;
+    }
+
+    /**
+     * @dev Cycles through a list of separators to split the api
+     * @dev result string. Returns list so that we can update invest contract with values.
+     * @param _result The raw string returned from the cryptocompare api with all crypto prices.
+    **/
+    function decodePrices(uint256[] _cryptos, string _result) 
+      public
+      view
+    returns (uint256[])
+    {
+        var s = _result.toSlice();
+        var delim = 'USD'.toSlice();
+
+        uint256[] memory prices = new uint256[](_cryptos.length);
+
+        var breakPart = s.split(delim).toString();
+        for(uint256 i = 0; i < _cryptos.length; i++) {
+            for (uint256 j = 0; j < _cryptos.length; j++) {
+                if (j == i) break;
+
+                // Check if either the regular or inverse has already been found
+                if ((_cryptos[j] == _cryptos[i] - 100) || (_cryptos[j] == _cryptos[i] + 100)) {
+                    prices[i] = (10 ** 36) / prices[j];
+                }
+            }
+
+            if (prices[i] == 0) {
+                var part = s.split(delim).toString();
+        
+                uint256 price = parseInt(part,18);
+                if (price > 0 && _cryptos[i] <= 100) prices[i] = price;
+                else if (price > 0) prices[i] = (10 ** 36) / price;
+            }
+        }
+        return prices;
+    }
+
+    /**
+     * @dev Calculate the COIN value of the cryptos to be bought/sold.
+     * @param _cryptoValues The value of the cryptos at time of call.
+    **/
+    function calculateValue(uint256[] _amounts, uint256[] _cryptoValues)
+      public
+      pure
+    returns (uint256 value)
+    {
+        for (uint256 i = 0; i < _amounts.length; i++) {
+            // 1 ether represents the demo COIN price.
+            value = value.add(_cryptoValues[i].mul(_amounts[i]).div(1 ether));
+        }
+    }
+    
+    /**
+     * @dev Converts given cryptos and amounts into a single uint256[] array.
+     * @param _cryptos Array of the crypto Ids to be bought.
+     * @param _amounts Array containing the amounts of each crypto to buy.
+    **/
+    function bitConv(uint256[] _cryptos, uint256[] _amounts)
+      public
+      pure
+    returns (uint256[])
+    {
+        uint256[] memory combined = new uint256[](_cryptos.length); 
+        for (uint256 i = 0; i < _cryptos.length; i++) {
+            combined[i] |= _cryptos[i];
+            combined[i] |= _amounts[i] << 8;
+        }
+        return combined;
+    }
+    
+    /**
+     * @dev Recovers the cryptos and amounts from combined array.
+     * @param _idsAndAmts Array of uints containing both crypto Id and amount.
+    **/
+    function bitRec(uint256[] _idsAndAmts) 
+      public
+      pure
+    returns (uint256[], uint256[]) 
+    {
+        uint256[] memory cryptos = new uint256[](_idsAndAmts.length);
+        uint256[] memory amounts = new uint256[](_idsAndAmts.length);
+
+        for (uint256 i = 0; i < _idsAndAmts.length; i++) {
+            cryptos[i] = uint256(uint8(_idsAndAmts[i]));
+            amounts[i] = uint256(uint248(_idsAndAmts[i] >> 8));
+        }
+        return (cryptos, amounts);
+    }
+
+    function getTrade(bytes32 _id)
+      public
+      view
+    returns (uint256[], address, bool)
+    {
+        TradeInfo memory trade = trades[_id];
+        return (trade.idsAndAmts, trade.beneficiary, trade.buy);
+    }
+    
+/** *************************** Only Owner *********************************** **/
+
+    /**
+     * @dev Change Oraclize gas limit and price.
+     * @param _newGasPrice New gas price to use in wei.
+    **/
+    function changeGas(uint256 _newGasPrice)
+      external
+      onlyOwner
+    returns (bool success)
+    {
+        customGasPrice = _newGasPrice;
+        //oraclize_setCustomGasPrice(_newGasPrice);
+        return true;
+    }
+    
+/** ************************** Only Coinvest ******************************* **/
+
+    /**
+     * @dev Allow the owner to take ERC20 tokens off of this contract if they are accidentally sent.
+     * @param _tokenContract The address of the token to withdraw (0x0 if Ether).
+     * @param _amount The amount of Ether to withdraw (because some needs to be left for Oraclize).
+    **/
+    function tokenEscape(address _tokenContract, uint256 _amount)
+      external
+      onlyCoinvest
+    {
+        if (_tokenContract == address(0)) coinvest.transfer(_amount);
+        else {
+            ERC20Interface lostToken = ERC20Interface(_tokenContract);
+        
+            uint256 stuckTokens = lostToken.balanceOf(address(this));
+            lostToken.transfer(coinvest, stuckTokens);
+        }
+    }
+    
+ 
+ /** ************************** Temp ************************************ **/
+    
+    // parseInt
+    function parseInt(string _a) internal pure returns (uint) {
+        return parseInt(_a, 0);
+    }
+
+    // parseInt(parseFloat*10^_b)
+    function parseInt(string _a, uint _b) internal pure returns (uint) {
+        bytes memory bresult = bytes(_a);
+        uint mint = 0;
+        bool decimals = false;
+        for (uint i=0; i<bresult.length; i++){
+            if ((bresult[i] >= 48)&&(bresult[i] <= 57)){
+                if (decimals){
+                   if (_b == 0) break;
+                    else _b--;
+                }
+                mint *= 10;
+                mint += uint(bresult[i]) - 48;
+            } else if (bresult[i] == 46) decimals = true;
+        }
+        if (_b > 0) mint *= 10**_b;
+        return mint;
+    }
+    
+}
+
+--------------------
+
+==== Integer Overflow ====
+Type: Warning
+Contract: Investment
+Function name: _function_0x727c2197
+PC address: 15936
+A possible integer overflow exists in the function `_function_0x727c2197`.
+The addition or multiplication may result in a value higher than the maximum representable integer.
+--------------------
+In file: /tmp/Investment.sol:18
+
+contract Investment is Ownable {//, usingOraclize 
+
+    using SafeMathLib for uint256;
+    using strings for *;
+    
+    Bank public bank;
+    UserData public userData;
+    ERC20Interface public token;
+    uint256 public customGasPrice;
+    
+    // Stores all trade info so Oraclize can return and update.
+    // idsAndAmts stores both the crypto ID and amounts with a uint8 and uint248 respectively.
+    struct TradeInfo {
+        uint256[] idsAndAmts;
+        address beneficiary;
+        bool buy;
+    }
+    
+    // Oraclize ID => TradeInfo
+    mapping (bytes32 => TradeInfo) public trades;
+    
+    // Crypto Id => string symbol used for crafting Oraclize URL
+    mapping (uint256 => string) public cryptoSymbols;
+    
+    // Balances of a user's free trades, generally given as reward for DAO voting.
+    mapping (address => uint256) public freeTrades;
+
+    event newOraclizeQuery(string description);
+    event Buy(address indexed buyer, uint256[] cryptoIds, uint256[] amounts, uint256[] prices);
+    event Sell(address indexed seller, uint256[] cryptoIds, uint256[] amounts, uint256[] prices);
+
+/** ********************************** Defaults ************************************* **/
+    
+    /**
+     * @dev Constructor function, construct with coinvest token.
+     * @param _token The address of the Coinvest token.
+     * @param _bank Contract where all of the user Coinvest tokens will be stored.
+     * @param _userData Contract where all of the user balances will be stored.
+    **/
+    function Investment(address _token, address _bank, address _userData)
+      public
+      payable
+    {
+        token = ERC20Interface(_token);
+        bank = Bank(_bank);
+        userData = UserData(_userData);
+
+        //oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
+        
+        cryptoSymbols[1] = "BTC,";
+        cryptoSymbols[2] = "ETH,";
+        cryptoSymbols[3] = "XRP,";
+        cryptoSymbols[4] = "LTC,";
+        cryptoSymbols[5] = "DASH,";
+        cryptoSymbols[6] = "BCH,";
+        cryptoSymbols[7] = "XMR,";
+        cryptoSymbols[8] = "XEM,";
+        cryptoSymbols[9] = "EOS,";
+       
+        customGasPrice = 20000000000;
+        //oraclize_setCustomGasPrice(10000000000);
+    }
+  
+    function()
+      external
+      payable
+    {
+        
+    }
+  
+/** *************************** ApproveAndCall FallBack **************************** **/
+  
+    /**
+     * @dev ApproveAndCall will send us data, we'll determine if the beneficiary is the sender, then we'll call this contract.
+    **/
+    function receiveApproval(address _from, uint256 _amount, address _token, bytes _data) 
+      public
+    {
+        require(msg.sender == address(token));
+        
+        // check here to make sure _from == beneficiary in data
+        address beneficiary;
+        assembly {
+            beneficiary := mload(add(_data,36))
+        }
+        require(_from == beneficiary);
+        
+        require(address(this).delegatecall(_data));
+    }
+  
+/** ********************************** External ************************************* **/
+    
+    /**
+     * @dev User calls to invest, will then call Oraclize and Oraclize adds holdings.
+     * @dev User must first approve this contract to transfer enough tokens to buy.
+     * @param _beneficiary The user making the call whose balance will be updated.
+     * @param _cryptoIds The Ids of the cryptos to invest in.
+     * @param _amounts The amount of each crypto the user wants to buy, delineated in 10 ^ 18 wei.
+    **/
+    function buy(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts)
+      public
+      onlySenderOrToken(_beneficiary)
+    returns (bool success)
+    {
+        require(_cryptoIds.length == _amounts.length);
+        require(getPrices(_beneficiary, _cryptoIds, _amounts, true));
+        return true;
+    }
+    
+    /**
+     * @dev User calls to sell holdings with same parameters as buy.
+    **/
+    function sell(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts)
+      public
+      onlySenderOrToken(_beneficiary)
+    returns (bool success)
+    {
+        require(_cryptoIds.length == _amounts.length);
+        require(getPrices(_beneficiary, _cryptoIds, _amounts, false));
+        return true;
+    }
+    
+/** ********************************** Internal ************************************ **/
+    
+    /**
+     * @dev Broker will call this for an investor to invest in one or multiple assets
+     * @param _beneficiary The address that is being bought for
+     * @param _cryptoIds The list of uint IDs for each crypto to buy
+     * @param _amounts The amounts of each crypto to buy (measured in 10 ** 18 wei!)
+     * @param _prices The price of each bought crypto at time of callback.
+     * @param _coinValue The amount of coin to transferFrom from user.
+    **/
+    function finalizeBuy(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts, uint256[] _prices, uint256 _coinValue)
+      public
+    returns (bool success)
+    {
+        // 1 ether (10 ^ 18) = demo COIN price
+        uint256 fee = 4990000000000000000 * (10 ** 18) / 1 ether;
+        
+        if (freeTrades[_beneficiary] >  0) freeTrades[_beneficiary] = freeTrades[_beneficiary].sub(1);
+        else require(token.transferFrom(_beneficiary, coinvest, fee));
+        
+        require(token.transferFrom(_beneficiary, bank, _coinValue));
+        require(userData.modifyHoldings(_beneficiary, _cryptoIds, _amounts, true));
+
+        Buy(_beneficiary, _cryptoIds, _amounts, _prices);
+        return true;
+    }
+    
+    /**
+     * @param _beneficiary The address that is being sold for
+     * @param _cryptoIds The list of uint IDs for each crypto
+     * @param _amounts The amounts of each crypto to sell (measured in 10 ** 18 wei!)
+     * @param _prices The prices of each crypto at time of callback.
+     * @param _coinValue The amount of COIN to be transferred to user.
+    **/
+    function finalizeSell(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts, uint256[] _prices, uint256 _coinValue)
+      public
+    returns (bool success)
+    {   
+        uint256 fee = 0;
+        if (freeTrades[_beneficiary] > 0) freeTrades[_beneficiary] = freeTrades[_beneficiary].sub(1);
+        else {
+            // 1 ether (10 ^ 18) = demo COIN price
+            fee = 4990000000000000000 * (10 ** 18) / 1 ether;
+            require(_coinValue > fee);
+            require(bank.transfer(coinvest, fee));
+        }
+
+        _coinValue = _coinValue.sub(fee);
+        require(bank.transfer(_beneficiary, _coinValue));
+        
+        // Subtract from balance of each held crypto for user.
+        require(userData.modifyHoldings(_beneficiary, _cryptoIds, _amounts, false));
+        
+        Sell(_beneficiary, _cryptoIds, _amounts, _prices);
+        return true;
+    }
+    
+/** ******************************** Only Owner ************************************* **/
+    
+    /**
+     * @dev Owner may add a crypto to the investment contract.
+     * @param _id Id of the new crypto.
+     * @param _symbol Symbol of the new crypto.
+    **/
+    function addCrypto(uint256 _id, string _symbol)
+      external
+      onlyOwner
+    returns (bool success)
+    {
+        cryptoSymbols[_id] = _symbol;
+        return true;
+    }
+    
+    /**
+     * @dev Allows Coinvest to reward users with free platform trades.
+     * @param _users List of users to reward.
+     * @param _trades List of free trades to give to each.
+    **/
+    function addTrades(address[] _users, uint256[] _trades)
+      external
+      onlyCoinvest
+    {
+        require(_users.length == _trades.length);
+        
+        for (uint256 i = 0; i < _users.length; i++) {
+            freeTrades[_users[i]] = freeTrades[_users[i]].add(_trades[i]);
+        }     
+    }
+
+    /**
+     * @dev Allows owner to change address of other contracts in the system.
+     * @param _token Address of the token contract.
+     * @param _bank Address of the bank contract.
+     * @param _userData Address of the user data contract.
+    **/
+    function changeContracts(address _token, address _bank, address _userData)
+      external
+      onlyOwner
+    returns (bool success)
+    {
+        token = ERC20Interface(_token);
+        bank = Bank(_bank);
+        userData = UserData(_userData);
+    }
+    
+/** ********************************* Modifiers ************************************* **/
+    
+    /**
+     * @dev For buys and sells we only want an approved broker or the buyer/seller
+     * @dev themselves to mess with the buyer/seller's portfolio
+     * @param _beneficiary The buyer or seller whose portfolio is being modified
+    **/
+    modifier onlySenderOrToken(address _beneficiary)
+    {
+        require(msg.sender == _beneficiary || msg.sender == address(token));
+        _;
+    }
+    
+/** ******************************************************************************** **/
+/** ******************************* Oracle Logic *********************************** **/
+/** ******************************************************************************** **/
+
+    /**
+     * @dev Here we Oraclize to CryptoCompare to get prices for these cryptos.
+     * @param _cryptos The IDs of the cryptos to get prices for.
+     * @param _amounts Amount of each crypto to buy.
+     * @param _buy Whether or not this is a buy (as opposed to sell).
+    **/
+    function getPrices(address _beneficiary, uint256[] _cryptos, uint256[] _amounts, bool _buy) 
+      internal
+    returns (bool success)
+    {
+        //if (oraclize_getPrice("URL") > this.balance) {
+        //    newOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
+        //} else {
+        //    newOraclizeQuery("Oraclize query was sent, standing by for the answer..");
+            string memory fullUrl = craftUrl(_cryptos);
+            
+            // Using 0x1 for testing without Oraclize
+            bytes32 queryId = 0x1;
+            
+            //oraclize_query("URL", fullUrl, 100000 * customGasPrice * _cryptos.length);
+            trades[queryId] = TradeInfo(bitConv(_cryptos, _amounts), _beneficiary, _buy);
+        //}
+        return true;
+    }
+    
+    /**
+     * @dev Oraclize calls and should simply set the query array to the int results.
+    **/
+    function __callback(bytes32 myid, string result, bytes proof)
+      public
+    {
+        //if (msg.sender != oraclize_cbAddress()) throw;
+    
+        TradeInfo memory tradeInfo = trades[myid];
+        var (a,b) = bitRec(tradeInfo.idsAndAmts);
+        uint256[] memory cryptos = a;
+        uint256[] memory amounts = b;
+
+        address beneficiary = tradeInfo.beneficiary;
+        bool buy = tradeInfo.buy;
+    
+        uint256[] memory cryptoValues = decodePrices(cryptos, result);
+        uint256 value = calculateValue(amounts, cryptoValues);
+        
+        if (buy) require(finalizeBuy(beneficiary, cryptos, amounts, cryptoValues, value));
+        else require(finalizeSell(beneficiary, cryptos, amounts, cryptoValues, value));
+    }
+    
+/** ******************************* Constants ************************************ **/
+    
+    /**
+     * @dev Crafts URL for Oraclize to grab data from.
+     * @param _cryptos The uint256 crypto ID of the cryptos to search.
+    **/
+    function craftUrl(uint256[] _cryptos)
+      public
+      view
+    returns (string)
+    {
+        var url = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=";
+        for (uint256 i = 0; i < _cryptos.length; i++) {
+            uint256 id = _cryptos[i];
+            if (id > 100) id = id.sub(100);
+
+            require(bytes(cryptoSymbols[id]).length > 0);
+            url = url.toSlice().concat(cryptoSymbols[id].toSlice());
+        }
+        url = url.toSlice().concat("&tsyms=USD".toSlice());
+        return url;
+    }
+
+    /**
+     * @dev Cycles through a list of separators to split the api
+     * @dev result string. Returns list so that we can update invest contract with values.
+     * @param _result The raw string returned from the cryptocompare api with all crypto prices.
+    **/
+    function decodePrices(uint256[] _cryptos, string _result) 
+      public
+      view
+    returns (uint256[])
+    {
+        var s = _result.toSlice();
+        var delim = 'USD'.toSlice();
+
+        uint256[] memory prices = new uint256[](_cryptos.length);
+
+        var breakPart = s.split(delim).toString();
+        for(uint256 i = 0; i < _cryptos.length; i++) {
+            for (uint256 j = 0; j < _cryptos.length; j++) {
+                if (j == i) break;
+
+                // Check if either the regular or inverse has already been found
+                if ((_cryptos[j] == _cryptos[i] - 100) || (_cryptos[j] == _cryptos[i] + 100)) {
+                    prices[i] = (10 ** 36) / prices[j];
+                }
+            }
+
+            if (prices[i] == 0) {
+                var part = s.split(delim).toString();
+        
+                uint256 price = parseInt(part,18);
+                if (price > 0 && _cryptos[i] <= 100) prices[i] = price;
+                else if (price > 0) prices[i] = (10 ** 36) / price;
+            }
+        }
+        return prices;
+    }
+
+    /**
+     * @dev Calculate the COIN value of the cryptos to be bought/sold.
+     * @param _cryptoValues The value of the cryptos at time of call.
+    **/
+    function calculateValue(uint256[] _amounts, uint256[] _cryptoValues)
+      public
+      pure
+    returns (uint256 value)
+    {
+        for (uint256 i = 0; i < _amounts.length; i++) {
+            // 1 ether represents the demo COIN price.
+            value = value.add(_cryptoValues[i].mul(_amounts[i]).div(1 ether));
+        }
+    }
+    
+    /**
+     * @dev Converts given cryptos and amounts into a single uint256[] array.
+     * @param _cryptos Array of the crypto Ids to be bought.
+     * @param _amounts Array containing the amounts of each crypto to buy.
+    **/
+    function bitConv(uint256[] _cryptos, uint256[] _amounts)
+      public
+      pure
+    returns (uint256[])
+    {
+        uint256[] memory combined = new uint256[](_cryptos.length); 
+        for (uint256 i = 0; i < _cryptos.length; i++) {
+            combined[i] |= _cryptos[i];
+            combined[i] |= _amounts[i] << 8;
+        }
+        return combined;
+    }
+    
+    /**
+     * @dev Recovers the cryptos and amounts from combined array.
+     * @param _idsAndAmts Array of uints containing both crypto Id and amount.
+    **/
+    function bitRec(uint256[] _idsAndAmts) 
+      public
+      pure
+    returns (uint256[], uint256[]) 
+    {
+        uint256[] memory cryptos = new uint256[](_idsAndAmts.length);
+        uint256[] memory amounts = new uint256[](_idsAndAmts.length);
+
+        for (uint256 i = 0; i < _idsAndAmts.length; i++) {
+            cryptos[i] = uint256(uint8(_idsAndAmts[i]));
+            amounts[i] = uint256(uint248(_idsAndAmts[i] >> 8));
+        }
+        return (cryptos, amounts);
+    }
+
+    function getTrade(bytes32 _id)
+      public
+      view
+    returns (uint256[], address, bool)
+    {
+        TradeInfo memory trade = trades[_id];
+        return (trade.idsAndAmts, trade.beneficiary, trade.buy);
+    }
+    
+/** *************************** Only Owner *********************************** **/
+
+    /**
+     * @dev Change Oraclize gas limit and price.
+     * @param _newGasPrice New gas price to use in wei.
+    **/
+    function changeGas(uint256 _newGasPrice)
+      external
+      onlyOwner
+    returns (bool success)
+    {
+        customGasPrice = _newGasPrice;
+        //oraclize_setCustomGasPrice(_newGasPrice);
+        return true;
+    }
+    
+/** ************************** Only Coinvest ******************************* **/
+
+    /**
+     * @dev Allow the owner to take ERC20 tokens off of this contract if they are accidentally sent.
+     * @param _tokenContract The address of the token to withdraw (0x0 if Ether).
+     * @param _amount The amount of Ether to withdraw (because some needs to be left for Oraclize).
+    **/
+    function tokenEscape(address _tokenContract, uint256 _amount)
+      external
+      onlyCoinvest
+    {
+        if (_tokenContract == address(0)) coinvest.transfer(_amount);
+        else {
+            ERC20Interface lostToken = ERC20Interface(_tokenContract);
+        
+            uint256 stuckTokens = lostToken.balanceOf(address(this));
+            lostToken.transfer(coinvest, stuckTokens);
+        }
+    }
+    
+ 
+ /** ************************** Temp ************************************ **/
+    
+    // parseInt
+    function parseInt(string _a) internal pure returns (uint) {
+        return parseInt(_a, 0);
+    }
+
+    // parseInt(parseFloat*10^_b)
+    function parseInt(string _a, uint _b) internal pure returns (uint) {
+        bytes memory bresult = bytes(_a);
+        uint mint = 0;
+        bool decimals = false;
+        for (uint i=0; i<bresult.length; i++){
+            if ((bresult[i] >= 48)&&(bresult[i] <= 57)){
+                if (decimals){
+                   if (_b == 0) break;
+                    else _b--;
+                }
+                mint *= 10;
+                mint += uint(bresult[i]) - 48;
+            } else if (bresult[i] == 46) decimals = true;
+        }
+        if (_b > 0) mint *= 10**_b;
+        return mint;
+    }
+    
+}
+
+--------------------
+
+
