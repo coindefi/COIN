@@ -1,29 +1,29 @@
-pragma solidity ^0.4.24; 
-import './ERC20Interface.sol'; 
+pragma solidity ^0.4.24;
+import './ERC20Interface.sol';
 import './Ownable.sol';
 
 contract TokenSwap is Ownable {
     
-    ERC20Interface public tokenV1;
-    ERC20Interface public tokenV2;
-    ERC20Interface public tokenV3;
+    ERC20Interface tokenV1;
+    ERC20Interface tokenV2;
+    ERC20Interface tokenV3;
     
     /**
-     * @param _tokenV1 The original ERC223 version of the Coinvest token.
-     * @param _tokenV2 The second iteration of the token using ERC865.
-     * @param _tokenV3 The new iteration of the Coinvest token.
+     * @param _oldToken Address of COIN V1.
+     * @param _newToken Address of COIN V2.
     **/
-    constructor(address _tokenV1, address _tokenV2, address _tokenV3) public {
+    function constructor(address _tokenV1, address _tokenV2, address _tokenV3) {
         tokenV1 = ERC20Interface(_tokenV1);
         tokenV2 = ERC20Interface(_tokenV2);
         tokenV3 = ERC20Interface(_tokenV3);
     }
+
     /**
      * @param _from The address that has transferred this contract tokens.
      * @param _value The amount of tokens that have been transferred.
      * @param _data The extra data sent with transfer (should be nothing).
     **/
-    function tokenFallback(address _from, uint _value, bytes _data)
+    function tokenFallback(address _from, uint _value, bytes _data) 
       external
     {
         require(msg.sender == address(tokenV1));
@@ -31,15 +31,16 @@ contract TokenSwap is Ownable {
         require(tokenV3.transfer(_from, _value));
         _data;
     }
+
     /**
      * @dev approveAndCall will be used on the old token to transfer from the user
-     * to the contract, which will then return to them the new tokens.
+     *      to the contract, which will then return to them the new tokens.
      * @param _from The user that is making the call.
      * @param _amount The amount of tokens being transferred to this swap contract.
      * @param _token The address of the token contract (address(oldToken))--not used.
      * @param _data Extra data with the call--not used.
     **/
-    function receiveApproval(address _from, uint256 _amount, address _token, bytes _data)
+    function receiveApproval(address _from, uint256 _amount, address _token, bytes _data) 
       public
     {
         require(msg.sender == address(tokenV2));
@@ -69,5 +70,5 @@ contract TokenSwap is Ownable {
             lostToken.transfer(coinvest, stuckTokens);
         }    
     }
-
+    
 }

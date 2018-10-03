@@ -74,7 +74,7 @@ contract('Token', function ([_, wallet]) {
 
   describe('new checks', function () {
 
-    it('should make invalid signature and fail on attempt to send', async function() {
+    it('should increase nonce on non-presigned revokeHash', async function() {
 
       let preSignedHash = await this.token.getPreSignedHash('0xa9059cbb', this.accountTwo, 1, 0,  1, 1)
       let signature = web3.eth.sign(this.owner, preSignedHash);

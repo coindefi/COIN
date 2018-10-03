@@ -166,3 +166,4 @@ const getBalance = (account, at) =>
     })
 
 })
+

@@ -678,3 +678,4 @@ contract CashToken is Ownable {
     }
     
 }
+
