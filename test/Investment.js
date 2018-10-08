@@ -161,7 +161,7 @@ contract('Investment', function ([_, wallet]) {
     })
 
     it('should fail on non-admin payment to fallback', async function () {
-        await this.investment.sendTransaction({to:this.investment.address,value:toEther(2),from:this.accountTwo}).should.be.rejectedWith(EVMRevert);
+        await this.investment.sendTransaction({to:this.investment.address,value:toEther(2),from:this.accountTwo}).should.be.rejectedWith(EVMRevert)
     })
 
     // Gonna do Ownable.sol checks here as well
@@ -196,6 +196,27 @@ contract('Investment', function ([_, wallet]) {
         coinInv.should.be.bignumber.equal(1)
         cashId.should.be.bignumber.equal(2)
         cashInv.should.be.bignumber.equal(3)
+    })
+
+
+    it('should be able to change coin and cash API URLs', async function () {
+        let coinUrl = await this.investment.coinUrl()
+        let cashUrl = await this.investment.cashUrl()
+
+        coinUrl.should.be.equal("https://min-api.cryptocompare.com/data/pricemulti?fsyms=COIN,")
+        cashUrl.should.be.equal("https://min-api.cryptocompare.com/data/pricemulti?fsyms=CASH,")
+
+        await this.investment.changeUrls("https://min-api.cryptocompare.com/data/pricemulti?fsyms=NOTCOIN,","https://min-api.cryptocompare.com/data/pricemulti?fsyms=NOTCASH,", {from:this.owner})
+
+        let newCoinUrl = await this.investment.coinUrl()
+        let newCashUrl = await this.investment.cashUrl()
+
+        newCoinUrl.should.be.equal("https://min-api.cryptocompare.com/data/pricemulti?fsyms=NOTCOIN,")
+        newCashUrl.should.be.equal("https://min-api.cryptocompare.com/data/pricemulti?fsyms=NOTCASH,")
+    })
+
+    it('should fail on URL change by non-owner', async function () {
+        await this.investment.changeUrls("https://min-api.cryptocompare.com/data/pricemulti?fsyms=NOTCOIN,","https://min-api.cryptocompare.com/data/pricemulti?fsyms=NOTCASH,", {from:this.accountTwo}).should.be.rejectedWith(EVMRevert)
     })
 
   })
