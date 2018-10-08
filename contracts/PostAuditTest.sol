@@ -280,6 +280,19 @@ contract PostAuditTest is Ownable//, usingOraclize
         bank = Bank(_bank);
         userData = UserData(_userData);
     }
+
+    /**
+     * @dev Needed in case our crypto symbols change or to switch from CryptoCompare (if site is compatible).
+     * @param _coinUrl The CryptoCompare API URL of the COIN token.
+     * @param _cashUrl The CryptoCompare API URL of the CASH token, if there is one.
+    **/
+    function changeUrls(string _coinUrl, string _cashUrl)
+      external
+      onlyOwner
+    {
+        coinUrl = _coinUrl;
+        cashUrl = _cashUrl;
+    }
     
 /** ********************************* Modifiers ************************************* **/
     
