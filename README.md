@@ -70,7 +70,9 @@ The functions to modify these addresses are only able to be called by the owner 
 <h1>Tokens</h1>
 The COIN token is based on the ERC865 proposal, allowing users to pay for gas using tokens rather than ether. This works by having a user sign a transaction hash with all desired data, then any delegate broadcasting the parameters and signed hash to the network in order for a transaction to be made.
 <br>
+<br>
 We’ve created COIN V3 because of a vulnerability in COIN V2. In COIN V2, signatures were used as unique identifiers to block any potential replay attacks on pre-signed transactions. The problem with this design was that it was vulnerable to transaction malleability. While transaction malleability was fixed for transactions on the Ethereum network by restricting signatures to the lower half of the EC, it was not fixed on the ecrecover pre-compiled contract, therefore allowing a signature to be replayed using its counterpart.
+<br>
 <br>
 To fix this problem, COIN V3 now uses the transaction hash of the pre-signed transaction as a unique identifier. This method ensures that, once a transaction is sent, it may never be sent again (of course, unless a new nonce is used).
 <br>
