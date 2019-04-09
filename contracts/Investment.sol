@@ -488,7 +488,7 @@ library InvestLib {
         combined = new uint256[](_cryptos.length); 
         for (uint256 i = 0; i < _cryptos.length; i++) {
             combined[i] = _cryptos[i];
-            combined[i] |= _amounts[i] << 8;
+            combined[i] |= _amounts[i] << 16;
         }
         return combined;
     }
@@ -506,8 +506,8 @@ library InvestLib {
         amounts = new uint256[](_idsAndAmts.length);
 
         for (uint256 i = 0; i < _idsAndAmts.length; i++) {
-            cryptos[i] = uint256(uint8(_idsAndAmts[i]));
-            amounts[i] = uint256(uint248(_idsAndAmts[i] >> 8));
+            cryptos[i] = uint256(uint16(_idsAndAmts[i]));
+            amounts[i] = uint256(uint240(_idsAndAmts[i] >> 16));
         }
         return (cryptos, amounts);
     }
