@@ -11,15 +11,16 @@ contract Investment is Ownable, usingOraclize {
 
     using SafeMathLib for uint256;
     using strings for *;
+    using InvestLib for *;
     
-    Bank public bank;
-    UserData public userData;
+    BankI public bank;
+    UserDataI public userData;
     
     address public coinToken;
     address public cashToken;
     uint256 public customGasPrice;
-    string public coinUrl = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=COIN,";
-    string public cashUrl = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=CASH,";
+    string public coinUrl = "https://price.coinve.st/api/priceTest?cryptos=COIN,";
+    string public cashUrl = "";
     bool public paused;
     
     uint256 public constant COIN_ID = 0;
@@ -45,9 +46,24 @@ contract Investment is Ownable, usingOraclize {
     // Balance of a user's free trades.
     mapping(address => uint256) public freeTrades;
 
-    event newOraclizeQuery(string description);
-    event Buy(address indexed buyer, uint256[] cryptoIds, uint256[] amounts, uint256[] prices, bool isCoin);
-    event Sell(address indexed seller, uint256[] cryptoIds, uint256[] amounts, uint256[] prices, bool isCoin);
+    event newOraclizeQuery(string description, bytes32 txHash, bytes32 queryId);
+    event Buy(
+              bytes32 indexed queryId, 
+              address indexed buyer, 
+              uint256[] cryptoIds, 
+              uint256[] amounts, 
+              uint256[] prices, 
+              bool isCoin
+              );
+              
+    event Sell(
+               bytes32 indexed queryId, 
+               address indexed seller, 
+               uint256[] cryptoIds, 
+               uint256[] amounts, 
+               uint256[] prices, 
+               bool isCoin
+               );
 
 /** ********************************** Defaults ************************************* **/
     
@@ -64,24 +80,24 @@ contract Investment is Ownable, usingOraclize {
     {
         coinToken = _coinToken;
         cashToken = _cashToken;
-        bank = Bank(_bank);
-        userData = UserData(_userData);
+        bank = BankI(_bank);
+        userData = UserDataI(_userData);
 
         oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
         
-        addCrypto(0, "COIN,", true);
-        addCrypto(0, "CASH,", true);
-        addCrypto(0, "BTC,", true);
-        addCrypto(0, "ETH,", true);
-        addCrypto(0, "XRP,", true);
-        addCrypto(0, "LTC,", true);
-        addCrypto(0, "DASH,", true);
-        addCrypto(0, "BCH,", true);
-        addCrypto(0, "XMR,", true);
-        addCrypto(0, "XEM,", true);
-        addCrypto(0, "EOS,", true);
-
-        customGasPrice = 20000000000;
+        addCrypto(0, "COIN,", false);
+        addCrypto(0, "", false);
+        addCrypto(0, "BTC,", false);
+        addCrypto(0, "ETH,", false);
+        addCrypto(0, "XRP,", false);
+        addCrypto(0, "LTC,", false);
+        addCrypto(0, "DASH,", false);
+        addCrypto(0, "BCH,", false);
+        addCrypto(0, "XMR,", false);
+        addCrypto(0, "XEM,", false);
+        addCrypto(0, "EOS,", false);
+        
+        customGasPrice = 5000000000;
         oraclize_setCustomGasPrice(customGasPrice);
     }
   
@@ -114,7 +130,7 @@ contract Investment is Ownable, usingOraclize {
         }
         require(_from == beneficiary);
         
-        require(address(this).delegatecall(_data));
+        address(this).delegatecall(_data);
         _token; _amount;
     }
   
@@ -128,7 +144,11 @@ contract Investment is Ownable, usingOraclize {
      * @param _amounts The amount of each crypto the user wants to buy, delineated in 10 ^ 18 wei.
      * @param _isCoin True/False of the crypto that is being used to invest is COIN/CASH.
     **/
-    function buy(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts, bool _isCoin)
+    function buy(
+        address _beneficiary, 
+        uint256[] _cryptoIds, 
+        uint256[] _amounts, 
+        bool _isCoin)
       public
       payable
       notPaused
@@ -138,10 +158,11 @@ contract Investment is Ownable, usingOraclize {
         getPrices(_beneficiary, _cryptoIds, _amounts, _isCoin, true);
     }
     
-    /**
-     * @dev User calls to sell holdings with same parameters as buy.
-    **/
-    function sell(address _beneficiary, uint256[] _cryptoIds, uint256[] _amounts, bool _isCoin)
+    function sell(
+        address _beneficiary, 
+        uint256[] _cryptoIds, 
+        uint256[] _amounts, 
+        bool _isCoin)
       public
       payable
       notPaused
@@ -162,14 +183,22 @@ contract Investment is Ownable, usingOraclize {
      * @param _coinValue The amount of coin to transferFrom from user.
      * @param _isCoin True/False of the crypto that is being used to invest is COIN/CASH.
     **/
-    function finalizeBuy(address _beneficiary, uint256[] memory _cryptoIds, uint256[] memory _amounts, uint256[] memory _prices, uint256 _coinValue, bool _isCoin)
+    function finalizeBuy(
+        address _beneficiary, 
+        uint256[] memory _cryptoIds, 
+        uint256[] memory _amounts, 
+        uint256[] memory _prices, 
+        uint256 _coinValue,
+        bool _isCoin,
+        bytes32 myid
+        )
       internal
     {
         ERC20Interface token;
         if (_isCoin) token = ERC20Interface(coinToken);
         else token = ERC20Interface(cashToken);
 
-        uint256 fee = 4990000000000000000 * (10 ** 18) / _prices[0];
+        uint256 fee = 990000000000000000 * (10 ** 18) / _prices[0];
         if (freeTrades[_beneficiary] >  0) freeTrades[_beneficiary] = freeTrades[_beneficiary].sub(1);
         else require(token.transferFrom(_beneficiary, coinvest, fee));
         
@@ -184,7 +213,7 @@ contract Investment is Ownable, usingOraclize {
             userData.modifyHoldings(_beneficiary, _cryptoIds, _amounts, true);
         }
 
-        emit Buy(_beneficiary, _cryptoIds, _amounts, _prices, _isCoin);
+        emit Buy(myid, _beneficiary, _cryptoIds, _amounts, _prices, _isCoin);
     }
     
     /**
@@ -195,10 +224,18 @@ contract Investment is Ownable, usingOraclize {
      * @param _coinValue The amount of COIN to be transferred to user.
      * @param _isCoin True/False of the crypto that is being used to invest is COIN/CASH.
     **/
-    function finalizeSell(address _beneficiary, uint256[] memory _cryptoIds, uint256[] memory _amounts, uint256[] memory _prices, uint256 _coinValue, bool _isCoin)
+    function finalizeSell(
+        address _beneficiary, 
+        uint256[] memory _cryptoIds, 
+        uint256[] memory _amounts, 
+        uint256[] memory _prices, 
+        uint256 _coinValue, 
+        bool _isCoin,
+        bytes32 myid
+        )
       internal
     {   
-        uint256 fee = 4990000000000000000 * (10 ** 18) / _prices[0];
+        uint256 fee = 990000000000000000 * (10 ** 18) / _prices[0];
         if (freeTrades[_beneficiary] > 0) freeTrades[_beneficiary] = freeTrades[_beneficiary].sub(1);
         else {
             require(_coinValue > fee);
@@ -211,7 +248,7 @@ contract Investment is Ownable, usingOraclize {
         // Subtract from balance of each held crypto for user.
         userData.modifyHoldings(_beneficiary, _cryptoIds, _amounts, false);
         
-        emit Sell(_beneficiary, _cryptoIds, _amounts, _prices, _isCoin);
+        emit Sell(myid, _beneficiary, _cryptoIds, _amounts, _prices, _isCoin);
     }
     
 /** ******************************** Only Owner ************************************* **/
@@ -243,56 +280,51 @@ contract Investment is Ownable, usingOraclize {
     **/
     function addTrades(address[] _users, uint256[] _trades)
       external
-      onlyCoinvest
+      onlyAdmin
     {
         require(_users.length == _trades.length);
-        
         for (uint256 i = 0; i < _users.length; i++) {
-            freeTrades[_users[i]] = freeTrades[_users[i]].add(_trades[i]);
+            freeTrades[_users[i]] = _trades[i];
         }     
     }
-
+    
     /**
-     * @dev Allows the owner of the contract to pause all buys and sells.
-     * @param _paused True to halt operations, false to continue.
+     * @dev We were having gas problems on launch so we consolidated here. Will clean up soon.
     **/
-    function alterPause(bool _paused)
-      external
-      onlyOwner
-    {
-        paused = _paused;
-    }
-
-    /**
-     * @dev Allows owner to change address of other contracts in the system.
-     * @param _coinToken Address of the COIN token contract.
-     * @param _cashToken Address of the CASH token contract.
-     * @param _bank Address of the bank contract.
-     * @param _userData Address of the user data contract.
-    **/
-    function changeContracts(address _coinToken, address _cashToken, address _bank, address _userData)
+    function changeVars(
+        address _coinToken, 
+        address _cashToken, 
+        address _bank, 
+        address _userData,
+        string _coinUrl,
+        string _cashUrl,
+        bool _paused)
       external
       onlyOwner
     {
         coinToken = _coinToken;
         cashToken = _cashToken;
-        bank = Bank(_bank);
-        userData = UserData(_userData);
-    }
-
-    /**
-     * @dev Needed in case our crypto symbols change or to switch from CryptoCompare (if site is compatible).
-     * @param _coinUrl The CryptoCompare API URL of the COIN token.
-     * @param _cashUrl The CryptoCompare API URL of the CASH token, if there is one.
-    **/
-    function changeUrls(string _coinUrl, string _cashUrl)
-      external
-      onlyOwner
-    {
+        bank = BankI(_bank);
+        userData = UserDataI(_userData);
         coinUrl = _coinUrl;
         cashUrl = _cashUrl;
+        paused = _paused;
     }
     
+    /**
+     * @dev Change Oraclize gas limit and price.
+     * @param _newGasPrice New gas price to use in wei.
+    **/
+    function changeGas(uint256 _newGasPrice)
+      external
+      onlyAdmin
+    returns (bool success)
+    {
+        customGasPrice = _newGasPrice;
+        oraclize_setCustomGasPrice(_newGasPrice);
+        return true;
+    }
+
 /** ********************************* Modifiers ************************************* **/
     
     /**
@@ -327,17 +359,22 @@ contract Investment is Ownable, usingOraclize {
      * @param _isCoin True/False of the crypto that is being used to invest is COIN/CASH.
      * @param _buy Whether or not this is a buy (as opposed to sell).
     **/
-    function getPrices(address _beneficiary, uint256[] memory _cryptos, uint256[] memory _amounts, bool _isCoin, bool _buy) 
-      public
+    function getPrices(
+        address _beneficiary, 
+        uint256[] memory _cryptos, 
+        uint256[] memory _amounts, 
+        bool _isCoin, 
+        bool _buy) 
+      internal
     {
+        bytes32 txHash = keccak256(abi.encodePacked(_beneficiary, _cryptos, _amounts, _isCoin, _buy));
         if (oraclize_getPrice("URL") > address(this).balance) {
-            emit newOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
+            emit newOraclizeQuery("Oraclize query was NOT sent", '0x0', '0x0');
         } else {
-           emit newOraclizeQuery("Oraclize query was sent, standing by for the answer..");
             string memory fullUrl = craftUrl(_cryptos, _isCoin);
-            
-            bytes32 queryId = oraclize_query("URL", fullUrl, 150000 + 40000 * _cryptos.length);
-            trades[queryId] = TradeInfo(_buy, _isCoin, _beneficiary, bitConv(_cryptos, _amounts));
+            bytes32 queryId = oraclize_query("URL", fullUrl, 150000 + 60000 * _cryptos.length);
+            trades[queryId] = TradeInfo(_buy, _isCoin, _beneficiary, InvestLib.bitConv(_cryptos, _amounts));
+            emit newOraclizeQuery("Oraclize query was sent", txHash, queryId);
         }
     }
     
@@ -353,17 +390,16 @@ contract Investment is Ownable, usingOraclize {
         require(msg.sender == oraclize_cbAddress());
 
         TradeInfo memory tradeInfo = trades[myid];
-        (uint256[] memory cryptos, uint256[] memory amounts) = bitRec(tradeInfo.idsAndAmts);
+        (uint256[] memory cryptos, uint256[] memory amounts) = InvestLib.bitRec(tradeInfo.idsAndAmts);
 
-        address beneficiary = tradeInfo.beneficiary;
-        bool isBuy = tradeInfo.isBuy;
         bool isCoin = tradeInfo.isCoin;
-    
-        uint256[] memory cryptoValues = decodePrices(cryptos, result, isCoin);
-        uint256 value = calculateValue(amounts, cryptoValues);
+        uint256[] memory cryptoValues = InvestLib.decodePrices(cryptos, result, isCoin);
+        uint256 value = InvestLib.calculateValue(amounts, cryptoValues);
         
-        if (isBuy) finalizeBuy(beneficiary, cryptos, amounts, cryptoValues, value, isCoin);
-        else finalizeSell(beneficiary, cryptos, amounts, cryptoValues, value, isCoin);
+        if (tradeInfo.isBuy) finalizeBuy(tradeInfo.beneficiary, cryptos, amounts, cryptoValues, value, isCoin, myid);
+        else finalizeSell(tradeInfo.beneficiary, cryptos, amounts, cryptoValues, value, isCoin, myid);
+        
+        delete trades[myid];
         proof;
     }
     
@@ -394,68 +430,35 @@ contract Investment is Ownable, usingOraclize {
             require(bytes(cryptoSymbols[id]).length > 0);
             url = url.toSlice().concat(cryptoSymbols[id].toSlice());
         }
-        url = url.toSlice().concat("&tsyms=USD".toSlice());
         return url;
     }
+    
+/** ************************** Only Coinvest ******************************* **/
 
     /**
-     * @dev Cycles through a list of separators to split the api
-     * @dev result string. Returns list so that we can update invest contract with values.
-     * @param _cryptos The cryptoIds being decoded.
-     * @param _result The raw string returned from the cryptocompare api with all crypto prices.
-     * @param _isCoin True/False of the crypto that is being used to invest is COIN/CASH.
+     * @dev Allow the owner to take ERC20 tokens off of this contract if they are accidentally sent.
+     * @param _tokenContract The address of the token to withdraw (0x0 if Ether).
+     * @param _amount The amount of Ether to withdraw (because some needs to be left for Oraclize).
     **/
-    function decodePrices(uint256[] memory _cryptos, string memory _result, bool _isCoin) 
-      public
-      pure
-    returns (uint256[] memory prices)
+    function tokenEscape(address _tokenContract, uint256 _amount)
+      external
+      coinvestOrOwner
     {
-        strings.slice memory s = _result.toSlice();
-        strings.slice memory delim = 'USD'.toSlice();
-        s.split(delim).toString();
-
-        prices = new uint256[](_cryptos.length + 1);
-        
-        //Find price of COIN first.
-        string memory coinPart = s.split(delim).toString();
-        prices[0] = parseInt(coinPart,18);
-
-        // Each crypto is advanced one in the prices array because COIN/CASH is index 0.
-        for(uint256 i = 0; i < _cryptos.length; i++) {
-            uint256 crypto = _cryptos[i];
-            bool isInverse = crypto % 2 > 0;
-            
-            // This loop is necessary because cryptocompare will only return 1 value when the same crypto is queried twice (in case of inverse).
-            for (uint256 j = 0; j < _cryptos.length; j++) {
-                if (j == i) break;
-                if ((isInverse && _cryptos[j] == crypto - 1) || (!isInverse && _cryptos[j] == crypto + 1)) {
-                    prices[i+1] = (10 ** 36) / prices[j+1];
-                    break;
-                }
-            }
-            
-            // If the crypto is COIN or CASH buying itself we don't want it to split price (because CryptoCompare will only return the first query)
-            if ((prices[i+1] == 0 && _isCoin && (crypto == COIN_ID || crypto == COIN_INV)) ||
-                (prices[i+1] == 0 && !_isCoin && (crypto == CASH_ID || crypto == CASH_INV))) {
-                
-                if (!isInverse) prices[i+1] = prices[0];
-                else prices[i+1] = (10 ** 36) / prices[0];
-            }
-
-            // Normal cases
-            else if (prices[i+1] == 0) {
-                string memory part = s.split(delim).toString();
-        
-                uint256 price = parseInt(part,18);
-                if (price > 0 && !isInverse) prices[i+1] = price;
-                else if (price > 0) prices[i+1] = (10 ** 36) / price;
-            }
+        if (_tokenContract == address(0)) coinvest.transfer(_amount);
+        else {
+            ERC20Interface lostToken = ERC20Interface(_tokenContract);
+            uint256 stuckTokens = lostToken.balanceOf(address(this));
+            lostToken.transfer(coinvest, stuckTokens);
         }
-
-        // Final check in case anything goes wrong.
-        for (uint256 k = 0; k < prices.length; k++) require(prices[k] > 0);
-        return prices;
     }
+
+}
+
+
+library InvestLib {
+
+    using SafeMathLib for uint256;
+    using strings for *;
 
     /**
      * @dev Calculate the COIN value of the cryptos to be bought/sold.
@@ -508,39 +511,91 @@ contract Investment is Ownable, usingOraclize {
         }
         return (cryptos, amounts);
     }
-    
-/** *************************** Only Owner *********************************** **/
 
     /**
-     * @dev Change Oraclize gas limit and price.
-     * @param _newGasPrice New gas price to use in wei.
+     * @dev Cycles through a list of separators to split the api
+     * @dev result string. Returns list so that we can update invest contract with values.
+     * @param _cryptos The cryptoIds being decoded.
+     * @param _result The raw string returned from the cryptocompare api with all crypto prices.
+     * @param _isCoin True/False of the crypto that is being used to invest is COIN/CASH.
     **/
-    function changeGas(uint256 _newGasPrice)
-      external
-      onlyOwner
+    function decodePrices(uint256[] memory _cryptos, string memory _result, bool _isCoin) 
+      public
+      view
+    returns (uint256[] memory prices)
     {
-        customGasPrice = _newGasPrice;
-        oraclize_setCustomGasPrice(_newGasPrice);
-    }
-    
-/** ************************** Only Coinvest ******************************* **/
+        strings.slice memory s = _result.toSlice();
+        strings.slice memory delim = "'USD'".toSlice();
+        s.split(delim).toString();
 
-    /**
-     * @dev Allow the owner to take ERC20 tokens off of this contract if they are accidentally sent.
-     * @param _tokenContract The address of the token to withdraw (0x0 if Ether).
-     * @param _amount The amount of Ether to withdraw (because some needs to be left for Oraclize).
-    **/
-    function tokenEscape(address _tokenContract, uint256 _amount)
-      external
-      onlyCoinvest
-    {
-        if (_tokenContract == address(0)) coinvest.transfer(_amount);
-        else {
-            ERC20Interface lostToken = ERC20Interface(_tokenContract);
+        prices = new uint256[](_cryptos.length + 1);
         
-            uint256 stuckTokens = lostToken.balanceOf(address(this));
-            lostToken.transfer(coinvest, stuckTokens);
+        //Find price of COIN first.
+        string memory coinPart = s.split(delim).toString();
+        prices[0] = parseInt(coinPart,18);
+
+        // Each crypto is advanced one in the prices array because COIN/CASH is index 0.
+        for(uint256 i = 0; i < _cryptos.length; i++) {
+            uint256 crypto = _cryptos[i];
+            bool isInverse = crypto % 2 > 0;
+            
+            // This loop is necessary because cryptocompare will only return 1 value when the same crypto is queried twice (in case of inverse).
+            for (uint256 j = 0; j < _cryptos.length; j++) {
+                if (j == i) break;
+                if ((isInverse && _cryptos[j] == crypto - 1) || (!isInverse && _cryptos[j] == crypto + 1)) {
+                    prices[i+1] = (10 ** 36) / prices[j+1];
+                    break;
+                }
+            }
+            
+            // If the crypto is COIN or CASH buying itself we don't want it to split price (because CryptoCompare will only return the first query)
+            if ((prices[i+1] == 0 && _isCoin && (crypto == 0 || crypto == 1)) ||
+                (prices[i+1] == 0 && !_isCoin && (crypto == 2 || crypto == 3))) {
+                
+                if (!isInverse) prices[i+1] = prices[0];
+                else prices[i+1] = (10 ** 36) / prices[0];
+            }
+
+            // Normal cases
+            else if (prices[i+1] == 0) {
+                string memory part = s.split(delim).toString();
+        
+                uint256 price = parseInt(part,18);
+                if (price > 0 && !isInverse) prices[i+1] = price;
+                else if (price > 0) prices[i+1] = (10 ** 36) / price;
+            }
         }
+
+        // Final check in case anything goes wrong.
+        for (uint256 k = 0; k < prices.length; k++) require(prices[k] > 0);
+        return prices;
+    }
+
+    /**
+     * @dev decodePrices needs to use these functions from the Oraclize contract.
+    **/
+    // parseInt
+    function parseInt(string _a) internal returns (uint) {
+        return parseInt(_a, 0);
+    }
+
+    // parseInt(parseFloat*10^_b)
+    function parseInt(string _a, uint _b) internal returns (uint) {
+        bytes memory bresult = bytes(_a);
+        uint mint = 0;
+        bool decimals = false;
+        for (uint i=0; i<bresult.length; i++){
+            if ((bresult[i] >= 48)&&(bresult[i] <= 57)){
+                if (decimals){
+                   if (_b == 0) break;
+                    else _b--;
+                }
+                mint *= 10;
+                mint += uint(bresult[i]) - 48;
+            } else if (bresult[i] == 46) decimals = true;
+        }
+        if (_b > 0) mint *= 10**_b;
+        return mint;
     }
 
 }
