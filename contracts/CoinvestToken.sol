@@ -10,15 +10,16 @@ contract ApproveAndCallFallBack {
 }
 
 /**
- * @title Coinvest COIN Token
- * @dev ERC20 contract utilizing ERC865-ish structure (3esmit's implementation with alterations).
+ * @title CoinDeFi COIN Token V4
+ * @dev ERC20 contract utilizing ERC865 structure (3esmit's implementation with alterations).
  * @dev to allow users to pay Ethereum fees in tokens.
+ * @author CoinDeFi -- Robert M.C. Forster
 **/
 contract CoinvestToken is Ownable {
     using SafeMathLib for uint256;
     
     string public constant symbol = "COIN";
-    string public constant name = "Coinvest COIN V3 Token";
+    string public constant name = "Coinvest COIN V4 Token";
     
     uint8 public constant decimals = 18;
     uint256 private _totalSupply = 107142857 * (10 ** 18);
@@ -36,9 +37,6 @@ contract CoinvestToken is Ownable {
 
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) allowed;
-    
-    // Keeps track of the last nonce sent from user. Used for delegated functions.
-    mapping(address => uint256) nonces;
     
     // Mapping of past used hashes: true if already used.
     mapping(address => mapping (bytes32 => bool)) invalidHashes;
@@ -62,6 +60,7 @@ contract CoinvestToken is Ownable {
     function receiveApproval(address _from, uint256 _amount, address _token, bytes _data) 
       public
     {
+        require(msg.sender != address(this));
         require(address(this).delegatecall(_data));
         _from; _amount; _token;
     }
@@ -248,12 +247,11 @@ contract CoinvestToken is Ownable {
         address from = recoverPreSigned(_signature, transferSig, _to, _value, "", _gasPrice, _nonce);
         require(from != address(0), "Invalid signature provided.");
         
-        // Require the hash has not been used, declare it used, increment nonce.
+        // Require the hash has not been used, declare it used.
         bytes32 txHash = getPreSignedHash(transferSig, _to, _value, "", _gasPrice, _nonce);
         require(!invalidHashes[from][txHash], "Transaction has already been executed.");
         invalidHashes[from][txHash] = true;
-        nonces[from]++;
-        
+
         // Internal transfer.
         require(_transfer(from, _to, _value));
 
@@ -289,8 +287,7 @@ contract CoinvestToken is Ownable {
         bytes32 txHash = getPreSignedHash(approveSig, _to, _value, "", _gasPrice, _nonce);
         require(!invalidHashes[from][txHash], "Transaction has already been executed.");
         invalidHashes[from][txHash] = true;
-        nonces[from]++;
-        
+
         require(_approve(from, _to, _value));
 
         if (_gasPrice > 0) {
@@ -322,8 +319,7 @@ contract CoinvestToken is Ownable {
         bytes32 txHash = getPreSignedHash(increaseApprovalSig, _to, _value, "", _gasPrice, _nonce);
         require(!invalidHashes[from][txHash], "Transaction has already been executed.");
         invalidHashes[from][txHash] = true;
-        nonces[from]++;
-        
+
         require(_increaseApproval(from, _to, _value));
 
         if (_gasPrice > 0) {
@@ -354,8 +350,7 @@ contract CoinvestToken is Ownable {
         bytes32 txHash = getPreSignedHash(decreaseApprovalSig, _to, _value, "", _gasPrice, _nonce);
         require(!invalidHashes[from][txHash], "Transaction has already been executed.");
         invalidHashes[from][txHash] = true;
-        nonces[from]++;
-        
+
         require(_decreaseApproval(from, _to, _value));
 
         if (_gasPrice > 0) {
@@ -391,8 +386,7 @@ contract CoinvestToken is Ownable {
         bytes32 txHash = getPreSignedHash(approveAndCallSig, _to, _value, _extraData, _gasPrice, _nonce);
         require(!invalidHashes[from][txHash], "Transaction has already been executed.");
         invalidHashes[from][txHash] = true;
-        nonces[from]++;
-        
+
         if (_value > 0) require(_approve(from, _to, _value));
         ApproveAndCallFallBack(_to).receiveApproval(from, _value, address(this), _extraData);
 
@@ -416,7 +410,6 @@ contract CoinvestToken is Ownable {
     returns (bool)
     {
         invalidHashes[msg.sender][_hashToRevoke] = true;
-        nonces[msg.sender]++;
         return true;
     }
     
@@ -440,8 +433,7 @@ contract CoinvestToken is Ownable {
         bytes32 txHash = getRevokeHash(_hashToRevoke, _gasPrice);
         require(!invalidHashes[from][txHash], "Transaction has already been executed.");
         invalidHashes[from][txHash] = true;
-        nonces[from]++;
-        
+
         invalidHashes[from][_hashToRevoke] = true;
         
         if (_gasPrice > 0) {
@@ -568,18 +560,6 @@ contract CoinvestToken is Ownable {
         if (v < 27) v += 27;
         if (v != 27 && v != 28) return address(0);
         return ecrecover(hash, v, r, s);
-    }
-
-    /**
-     * @dev Frontend queries to find the next nonce of the user so they can find the new nonce to send.
-     * @param _owner Address that will be sending the COIN.
-    **/
-    function getNonce(address _owner)
-      external
-      view
-    returns (uint256 nonce)
-    {
-        return nonces[_owner];
     }
 
 /** ****************************** Constants ******************************* **/
