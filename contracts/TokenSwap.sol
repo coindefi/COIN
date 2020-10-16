@@ -7,16 +7,19 @@ contract TokenSwap is Ownable {
     ERC20Interface public tokenV1;
     ERC20Interface public tokenV2;
     ERC20Interface public tokenV3;
+    ERC20Interface public tokenV4;
     
     /**
      * @param _tokenV1 The original ERC223 version of the Coinvest token.
      * @param _tokenV2 The second iteration of the token using ERC865.
-     * @param _tokenV3 The new iteration of the Coinvest token.
+     * @param _tokenV3 The third iteration of the Coinvest token.
+     * @param _tokenV4 The new iteration of the CoinDeFi token (the 3rd with gas savings).
     **/
-    constructor(address _tokenV1, address _tokenV2, address _tokenV3) public {
+    constructor(address _tokenV1, address _tokenV2, address _tokenV3, address _tokenV4) public {
         tokenV1 = ERC20Interface(_tokenV1);
         tokenV2 = ERC20Interface(_tokenV2);
         tokenV3 = ERC20Interface(_tokenV3);
+        tokenV4 = ERC20Interface(_tokenV4);
     }
     /**
      * @param _from The address that has transferred this contract tokens.
@@ -28,7 +31,7 @@ contract TokenSwap is Ownable {
     {
         require(msg.sender == address(tokenV1));
         require(_value > 0);
-        require(tokenV3.transfer(_from, _value));
+        require(tokenV4.transfer(_from, _value));
         _data;
     }
     /**
@@ -42,10 +45,11 @@ contract TokenSwap is Ownable {
     function receiveApproval(address _from, uint256 _amount, address _token, bytes _data)
       public
     {
-        require(msg.sender == address(tokenV2));
+        address sender = msg.sender;
+        require(sender == address(tokenV2) || sender == address(tokenV3));
         require(_amount > 0);
-        require(tokenV2.transferFrom(_from, address(this), _amount));
-        require(tokenV3.transfer(_from, _amount));
+        require(ERC20Interface(sender).transferFrom(_from, address(this), _amount));
+        require(tokenV4.transfer(_from, _amount));
         _token; _data;
     }
     
