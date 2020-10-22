@@ -10,16 +10,16 @@ contract ApproveAndCallFallBack {
 }
 
 /**
- * @title CoinDeFi COIN Token V4
+ * @title Coin COIN Token V4
  * @dev ERC20 contract utilizing ERC865 structure (3esmit's implementation with alterations).
  * @dev to allow users to pay Ethereum fees in tokens.
- * @author CoinDeFi -- Robert M.C. Forster
+ * @author Coin -- Robert M.C. Forster
 **/
 contract CoinvestToken is Ownable {
     using SafeMathLib for uint256;
     
     string public constant symbol = "COIN";
-    string public constant name = "Coinvest COIN V4 Token";
+    string public constant name = "Coin COIN V4 Token";
     
     uint8 public constant decimals = 18;
     uint256 private _totalSupply = 107142857 * (10 ** 18);
