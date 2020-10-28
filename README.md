@@ -1,5 +1,5 @@
-<h1>Coinvest Platform</h1>
-The Coinvest Platform allows users to buy and sell cryptocurrencies from any blockchain in an easy, simple, and decentralized manner. 
+<h1>Coin Platform</h1>
+The Coin Platform allows users to buy and sell cryptocurrencies from any blockchain in an easy, simple, and decentralized manner. 
 <br>
 <br>
 The platform works by accepting an investment request from a user, Oraclizing to get the current market price of the crypto, calculating how much the desired amount will cost, then updating the user’s balance and transferring their COIN or CASH tokens to the bank or from the bank. A user may buy a single crypto, an index fund of cryptos, or even inverse cryptos.
