@@ -4,8 +4,10 @@
 <br>
 Coin Wallet is an all-in-one P2P cross-chain decentralized cryptocurrency wallet, exchange, and AI assistant that is powered by atomic swaps and artificial intelligence. Coin Wallet is non-custodial, lives in a browser extension, and includes an integrated cryptocurrency wallet for users to store popular digital assets such as Bitcoin, Ethereum, ERC20 supported tokens, and more. For exchanging assets, Coin Wallet leverages atomic swap technology using Hash Time Lock contracts to handle direct peer-to-peer trustless transactions across different blockchains. The integrated AI assistant transforms the traditional financial experience by highlighting and providing insights for blockchain-specific keywords on any web page. Additionally, the Coin AI enables the ability to execute transactions by simply typing a command in any input field. The combination of decentralized P2P technology, cross-chain interoperability, and AI integration, creates a secure and unparalleled experience to help consumers save time and money.
 <br>
+
 Coin Exchange is a P2P cross-chain decentralized exchange that is compatible with any Internet web browser. It utilizes the same atomic swap technology in the Coin Wallet; however, does not include a native wallet and the Coin AI assistant. This enables users to connect their favorite web3 cryptocurrency wallet (including Coin Wallet) and does not require the installation of a browser extension.
 <br>
+
 Coin Staking is a smart contract that enables users to deposit and earn additional $COIN™ rewards by lending their existing holdings. Staked tokens earn rewards and are returned in $COIN™ from the Coin staking reserve.
 <br>
 <br>
@@ -13,6 +15,7 @@ Coin Staking is a smart contract that enables users to deposit and earn addition
 <br>
 Governance rights are a basic feature of Distributed Autonomous Organizations that entitle holders to influence the direction of the related products and services or basic protocol decisions. Governance rights help build community as token holders can be participants in the governance process and ensure decisions are not made solely by centralized parties or individuals.
 <br>
+
 Coin Governance is a smart contract that enables token holders to vote on the company and community-related decisions. This can include but is not limited to, protocol upgrades, features, exchange listings, and more. Token holders can deposit $COIN™ into the smart contract for an equivalent weighted value in votes. Thus, allowing larger token holders to have a larger influence on all proposed votes.
 <br>
 <h2>$COIN™ Token</h2>
