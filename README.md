@@ -4,7 +4,7 @@
 <br>
 <br>
 
-<h2>dApps</h2>
+<h2>Coin dApps</h2>
 
 Coin Wallet is an all-in-one P2P cross-chain decentralized cryptocurrency wallet, exchange, and AI assistant that is powered by atomic swaps and artificial intelligence. Coin Wallet is non-custodial, lives in a browser extension, and includes an integrated cryptocurrency wallet for users to store popular digital assets such as Bitcoin, Ethereum, ERC20 supported tokens, and more. For exchanging assets, Coin Wallet leverages atomic swap technology using Hash Time Lock contracts to handle direct peer-to-peer trustless transactions across different blockchains. The integrated AI assistant transforms the traditional financial experience by highlighting and providing insights for blockchain-specific keywords on any web page. Additionally, the Coin AI enables the ability to execute transactions by simply typing a command in any input field. The combination of decentralized P2P technology, cross-chain interoperability, and AI integration, creates a secure and unparalleled experience to help consumers save time and money.
 <br>
