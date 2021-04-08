@@ -1,6 +1,7 @@
-<h1>Ecosystem</h1>
+<h1>Coin Ecosystem</h1>
 
 <b>Coin</b> is a digital decentralized network comprised of protocols, smart contracts, dApps, and services that help facilitate the transfer of value across the Internet. Coin seeks to create an open financial system composed of decentralized solutions that empower consumers to execute financial transactions with freedom and simplicity.
+<br>
 <br>
 
 <h2>dApps</h2>
