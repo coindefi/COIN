@@ -1,6 +1,9 @@
 <b>Coin</b> is a digital decentralized network comprised of protocols, smart contracts, dApps, and services that help facilitate the transfer of value across the Internet. Coin seeks to create an open financial system composed of decentralized solutions that empower consumers to execute financial transactions with freedom and simplicity.
 <br>
-<h2>Ecosystem</h2>
+<h1>Ecosystem</h1>
+<br>
+<br>
+<h2>dApps/h2>
 
 Coin Wallet is an all-in-one P2P cross-chain decentralized cryptocurrency wallet, exchange, and AI assistant that is powered by atomic swaps and artificial intelligence. Coin Wallet is non-custodial, lives in a browser extension, and includes an integrated cryptocurrency wallet for users to store popular digital assets such as Bitcoin, Ethereum, ERC20 supported tokens, and more. For exchanging assets, Coin Wallet leverages atomic swap technology using Hash Time Lock contracts to handle direct peer-to-peer trustless transactions across different blockchains. The integrated AI assistant transforms the traditional financial experience by highlighting and providing insights for blockchain-specific keywords on any web page. Additionally, the Coin AI enables the ability to execute transactions by simply typing a command in any input field. The combination of decentralized P2P technology, cross-chain interoperability, and AI integration, creates a secure and unparalleled experience to help consumers save time and money.
 <br>
@@ -8,6 +11,8 @@ Coin Wallet is an all-in-one P2P cross-chain decentralized cryptocurrency wallet
 
 Coin Exchange is a P2P cross-chain decentralized exchange that is compatible with any Internet web browser. It utilizes the same atomic swap technology in the Coin Wallet; however, does not include a native wallet and the Coin AI assistant. This enables users to connect their favorite web3 cryptocurrency wallet (including Coin Wallet) and does not require the installation of a browser extension.
 <br>
+<br>
+<h2>Coin Staking</h2>
 
 Coin Staking is a smart contract that enables users to deposit and earn additional $COIN™ rewards by lending their existing holdings. Staked tokens earn rewards and are returned in $COIN™ from the Coin staking reserve.
 <br>
