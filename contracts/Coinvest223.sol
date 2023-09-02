@@ -38,13 +38,13 @@ contract SafeMath {
 }
  
 contract Coinvest223 is SafeMath {
-    
+
+    uint256 public lockupEndTime; // lockupEndTime is needed to determine when users may start transferring.
     address public maintainer;
     address public icoContract; // icoContract is needed to allow it to transfer tokens during crowdsale.
-    uint256 public lockupEndTime; // lockupEndTime is needed to determine when users may start transferring.
     
-    bool public ERC223Transfer_enabled = false;
-    bool public Transfer_data_enabled = false;
+    bool public ERC223Transfer_enabled;
+    bool public Transfer_data_enabled;
     bool public Transfer_nodata_enabled = true;
 
     event Transfer(address indexed from, address indexed to, uint value, bytes data);
